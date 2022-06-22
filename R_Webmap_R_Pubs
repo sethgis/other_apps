@@ -1,0 +1,189 @@
+library(raster) 
+library(rgdal)
+library(sp)
+library(ggplot2)
+library(terra)
+library(maptools)
+library(raster)
+library(tidyverse)
+library(raster)
+library(sf)
+library(whitebox)
+library(tmap)
+library(stars)
+library(rayshader)
+library(rgl)
+
+
+wbt_options()
+wbt_init(exe_path = wbt_exe_path(shell_quote = FALSE))
+wbt_init(exe_path=...)
+ 
+
+whitebox::wbt_init('C:\Users\LOCATE02\AppData\Local\Temp\Rtmp6Ztvja\downloaded_packages')
+
+wbt_init(exe_path = ("C:\Users\LOCATE02\AppData\Local\Temp")
+         
+knitr::knit_hooks$set(webgl = hook_webgl)
+
+theme_set(theme_classic())
+
+
+tmap_mode("view")
+
+
+
+ELEVATION<-raster('ELEVATION_WATER_BUSIA.tif')
+JRC<-raster('JRC_WATER.tif')
+TWI<-raster('TWI_BUSIA_WATER.tif')
+NDWI<-raster('NDWI_WATER.tif')
+DEM <- raster('DEM_BUSIA.tif')
+
+opts <- tmap_options(basemaps = c(Canvas = "Esri.WorldGrayCanvas", Imagery = "Esri.WorldImagery"),
+                     overlays = c(Labels = paste0("http://services.arcgisonline.com/arcgis/rest/services/Canvas/",
+                                                  "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}")))
+
+
+tm_shape(ELEVATION)+
+tm_raster(style = "cont", palette = c('PuOr'), legend.show = TRUE)+tm_shape(DEM)+
+  tm_raster(style = "cont", palette = c('PuOr'), legend.show = TRUE)+
+tm_scale_bar()+tm_shape(JRC)+
+tm_raster(style = "cont", palette = "blue", legend.show = TRUE)+
+tm_scale_bar()+tm_shape(TWI)+
+tm_raster(style = "cont", palette = c('blue','darkblue'), legend.show = TRUE)+
+tm_scale_bar()+tm_shape(NDWI)+
+  tm_raster(style = "cont", palette = "blue", legend.show = TRUE)+
+  tm_scale_bar()+tm_basemap(leaflet::providers$Stamen.Watercolor)+tm_compass(type="radar", position=c("right", "bottom"), show.labels = 3)+tm_mouse_coordinates()
+
+
+
+alt <- getData('alt', country='CHE')
+slope <- terrain(DEM, opt='slope')
+plot(slope)
+aspect <- terrain(DEM, opt='aspect')
+hill <- hillShade(DEM, aspect, -1, 2000, midpoint = NA)
+plot(hill)
+
+
+
+wbt_hillshade(dem= 'DEM_BUSIA.tif',
+             output = 'Hillshade.tif',
+             azimuth = 115)
+
+hillshade <- raster("Hillshade.tif")
+
+tm_shape(hillshade)+
+ tm_raster(style = "cont",palette = "-Greys", legend.show = FALSE)+
+ tm_scale_bar()
+
+
+tm_shape(hill)+tm_raster(style = "cont", palette = "PuOr", legend.show = TRUE)+
+ tm_scale_bar()+tm_shape(DEM, midpoint = NA)+tm_raster(style = "cont", palette = "PuOr", legend.show = TRUE)+
+ tm_scale_bar()
+
+dem <- system.file("extdata", "DEM_BUSIA.tif", package = "whitebox")
+
+
+## 1. FeaturePreservingSmoothing
+wbt_feature_preserving_smoothing(
+ dem = dem,
+ output = "./smoothed.tif",
+ filter = 9
+)
+
+
+wbt_breach_depressions_least_cost(
+ dem = "DEM_BUSIA.tif",
+ output = "bmstationdem_breached.tif",
+ dist = 5,
+ fill = TRUE)
+
+
+wbt_breach_depressions_least_cost(
+ dem = 'DEM_BUSIA.tif',
+ output = 'DEM_BUSIA_DEPRESSION.tif',
+ dist = 5,
+ max_cost = NULL,
+ min_dist = TRUE,
+ flat_increment = NULL,
+ fill = TRUE,
+ verbose_mode = FALSE,
+ compress_rasters = FALSE,
+ command_only = FALSE
+)
+
+
+library(whitebox)
+if(wbt_init()==TRUE){print("all good")}
+
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
