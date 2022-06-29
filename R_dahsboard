@@ -1,0 +1,139 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+
+
+
+# Define UI for application that draws a histogram
+
+library(shiny)
+library(shinydashboard)
+library(shinythemes)
+library(dplyr)
+library(readr)
+library(leaflet)
+library(RColorBrewer)
+library(maps)
+library(rgdal)
+
+
+library(sf)
+library(sp)
+help(shinydashboard)
+
+
+library(raster)
+
+library(lubridate)
+
+library(remotes)
+library(readxl)
+library(RColorBrewer)
+library(sf)
+library(rgdal)
+library(maptools)
+library(dplyr)
+library(rsconnect)
+getwd()
+
+
+world_spdf <- readOGR("TM_WORLD_BORDERS_SIMPL-0.3.shp")
+world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
+world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+world_spdf
+world_spdf@data$POP2005
+mypalette <- colorQuantile( palette="inferno", domain=shape$population, na.color="transparent")
+mypalette(c(45,43))
+mybins <- c(0,10,20,50,100,500,Inf)
+
+shape <- st_read("POPULATION.shp")
+
+mypalette <- colorQuantile( palette="inferno", domain=shape$population, na.color="transparent")
+mypalette(c(45,43))
+mybins <- c(100000,300000,500000,700000,9000000,1100000,Inf)
+
+unique(shape$admin_leve)
+unique(shape$COUNTRYAFF)
+getwd()
+
+
+
+
+ ui <- dashboardPage(
+      
+      dashboardHeader(
+            title = "Spatial Visualizer",
+            titleWidth = 450
+            
+        ),
+       dashboardSidebar(width= 350, height = 900, 
+                         sidebarUserPanel("Analytics Type", 
+                                          subtitle = a(href = "http://sethnyawacha.surge.sh/", icon("circle", class = "text-success"), "Owner"),
+                                                       # Image file should be in www/ subdir
+                                                       ),
+                         sidebarSearchForm(label = "Enter a number", "searchText", "searchButton"),
+                         
+                         sidebarMenu(
+                             # Setting id makes input$tabs give the tabName of currently-selected tab
+                             
+                             menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+                            
+                             menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
+                                      badgeColor = "green"),
+                                     
+                            
+                             menuItem("Charts", icon = icon("bar-chart-o"),
+                                      menuSubItem("Pie charts", tabName = "subitem1"),
+                                      menuSubItem("bar plots", tabName = "subitem2"))),
+                            selectizeInput("Level", "ADM Level:",unique(shape$name)),
+                            selectizeInput("County", "County:",c("Kwale","Kilifi","Mombasa","Kenya"), selected = "Kwale"    ),
+                            
+                            textOutput("result"),
+                            dateInput("date8", "Baseline Period - Start Date:", value = "2012-02-29",
+                                       datesdisabled = c("2012-03-01", "2012-03-02")),
+                            dateInput("date9", "Baseline Period - End Date:", value = "2012-02-29",
+                                   datesdisabled = c("2012-03-01", "2012-03-02")),
+                            dateInput("date10", "Analysis Period - Start Date:", value = "2012-02-29",
+                                   datesdisabled = c("2012-03-01", "2012-03-02")),
+                            dateInput("date11", "Analysis Period - End Date:", value = "2012-02-29",
+                                   datesdisabled = c("2012-03-01", "2012-03-02")),
+                            submitButton("Submit", icon("refresh"))),
+      
+      
+        
+      dashboardBody(leafletOutput("mymap", width = 2000, height = 930))
+    )
+                     
+                    
+
+           
+  server = function(input, output, session) {
+       if (interactive()){
+        out <- renderText({input$County})
+        polly <- shape[shape$name %in% c(out)]
+        output$mymap <- renderLeaflet({
+        leaflet(polly, width = 2000, height = 930) %>%
+        setView(37.0, 2.0, 7) %>% addProviderTiles("CartoDB.Positron") %>% addPolygons(data = polly,fillColor = ~mypalette(shape$population), popup = c(shape$name, shape$population), stroke=FALSE )
+    
+        })}
+    
+    observeEvent(input$County, {
+      out <- renderText({input$County})
+      eve <- shape[shape$name %in% c(out)]
+      leafletProxy("mymap",data = polly, deferUntilFlush = FALSE) %>% addProviderTiles("CartoDB.Positron")%>% addPolygons(data = polly, popup = c(shape$name, shape$population))
+    
+    })
+        
+    }
+    
+
+
+shinyApp(ui, server)
+
+
