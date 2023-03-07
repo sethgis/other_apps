@@ -1,0 +1,81 @@
+library(sf)
+library(raster)
+library(rgdal)
+library(spam)
+library(viridis)
+library(viridisLite)
+library(fields)
+library(raster)
+library(fields)
+library(unikn)
+library(sp)
+lib_names=c("raster","ggplot2","unikn",
+            "gridExtra","rgdal","fields",
+            "RColorBrewer","ncdf4","rasterVis","rgeos","reshape2","maps")
+library(lattice)
+library(rasterVis)
+library(RColorBrewer)
+library(AOI)
+library(sf)
+library(sf)
+library(ggplot2)
+library(latticeExtra)  
+library(latticeExtra)
+library(leaflet)
+library(lattice)
+library(survival)
+library(Formula)
+library(ggplot2)
+library(Hmisc)
+
+
+# Import the shapefile of global IPCC climate reference regions (only for land) 
+IPCC_shp = readOGR("gadm41_NGA_1.shp",verbose = FALSE)
+# View attribute table of the shapefile
+head(IPCC_shp@data)
+
+sub_ras_brick<-stack('AFEX_WHEAT.tif')
+
+
+
+brick<-sub_ras_brick[[10:13]]
+brick
+
+
+names(brick)<-c('October 2022','November 2022','December 2022','January 2023')
+
+
+labels <- layer(sp.text(coordinates(IPCC_shp), txt = IPCC_shp$NAME_1, pos = 1))
+labels
+
+ 
+
+mapTheme = rasterTheme(region = brewer.pal(10,"Spectral")) # Set raster theme (color etc.)
+my.at=seq(-1,1,0.1)                               # Set colorkey/ colorbar sequence
+myColorkey = list(at=my.at, space="right")        # Set colorkey/colorbar to the right
+
+plt= rasterVis::levelplot(brick,   # Select first 4 raster layers to plot
+                          margin = T,          
+                          pretty=TRUE,             
+                          layout=c(2,2),
+                        # Layout of the plots
+                          row.values=2,            # Number of rows
+                          par.settings = mapTheme, # Add user define theme
+                          colorkey=myColorkey,      # Add user defined 
+                          main=c('Drought and Flood Index Map'))
+plt=plt + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1))  
+print(plt)
+
++ latticeExtra::layer(sp.text(coordinates(IPCC_shp),txt = IPCC_shp$NAME_1)
+
+IPCC_shp
+
+
+plt= rasterVis::levelplot(sub_ras_brick[[1:4]],main="SPI PLOTS")
+
+plt=plt + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1)) # Add coastline to the plots
+print(plt)
+
+
+labels <- layer(sp.text(coordinates(SP), txt = IPCC_shp$NAME_, pos = 1))
+
