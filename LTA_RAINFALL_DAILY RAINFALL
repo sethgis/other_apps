@@ -1,0 +1,210 @@
+import ee
+import datetime
+import folium
+import params
+import os
+import subprocess
+
+# Import the matplotlib.pyplot module.
+import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+import numpy as np
+import requests
+# import pillow
+from PIL import Image
+import shutil
+import urllib
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import pandas as pd
+
+from scipy import optimize
+
+try:
+    import geemap
+except ImportError:
+    print('geemap package not installed. Installing ...')
+    subprocess.check_call(["python", '-m', 'pip', 'install', 'geemap'])
+
+
+MODEL = os.path.dirname(os.path.abspath("__file__"))
+
+ppk_file = os.path.join(MODEL, "service_account.json")
+
+service_account = "seth-311@seth-1568964691342.iam.gserviceaccount.com"
+
+private_key = ppk_file
+
+credentials = ee.ServiceAccountCredentials(service_account, private_key)
+ee.Initialize(credentials)
+
+
+"""ACCESSING AREA OF INTEREST"""
+
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR_BOUNDARIES/KE_Admin_Level_1')
+table1 = table.geometry()
+
+
+
+
+
+"""
+COMPUTING THE LONG TERM AVERAGE RAINFALL FOR A GIVEN LOCATION
+ """
+
+months = ee.List.sequence(1, 360, 5)
+
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2023-12-31'))
+
+""" MAKE A FUNCTION TO COMPUTE A DAILY AVERAGE RAINFALL OVER THE PAST FIVE YEARS"""
+
+def function2(m):
+    return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
+    .mean().set('day_of_year', m).set('system:time_start', sst.get('system:time_start'))
+    
+""" CALLING THE FUNCTION AND PRINTING OUT THE OUTPUTS"""
+LTA = ee.ImageCollection.fromImages(months.map(function2))
+
+
+
+
+""" ACCESSING THE DAILY RAINFALL PATTERN FOR THE YEAR 2023"""
+
+DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+        .filterDate(ee.Date('2022-01-01'), ee.Date('2022-12-31'))
+ 
+    
+
+BANDS = DAILY.toBands()
+LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/Machakos')
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+series = BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series = series.getInfo()
+
+
+
+
+EVI_anom = np.array(list(dic_series['features'][0]['properties'].values()))
+# print(EVI_anom)
+array1 = pd.DataFrame(EVI_anom).reset_index()
+
+
+
+
+series2 = LTA_BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series2 = series2.getInfo()
+
+
+dic_series2
+EVI_anom2 = np.array(list(dic_series2['features'][0]['properties'].values()))
+# print(EVI_anom)
+array2 = pd.DataFrame(EVI_anom2).reset_index()
+
+
+
+
+import datetime
+import pandas as pd
+ 
+# initializing date
+test_date = datetime.datetime.strptime("01-01-2022", "%d-%m-%Y")
+ 
+
+K = 366
+ 
+date_generated = pd.date_range(test_date, periods=K)
+
+
+
+date_gen = date_generated[::5]
+
+date_frame = (pd.DataFrame(date_gen)).reset_index()
+
+
+merged = pd.merge(pd.merge(array1,array2,on='index'),date_frame,on='index')
+merged
+
+
+
+
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+  
+merged2 = merged
+# merged2.columns()
+merged3 = merged2.rename(columns = {'0_x':'Daily', '0_y':'LTA',0:'Date' })
+
+
+df2 = merged3.iloc[:-2 , :]
+
+
+df2['Daily']=df2['Daily'].astype(float)
+df2['LTA']=df2['LTA'].astype(float)
+
+df = df2
+
+# df2['LTA'].plot(kind='line', marker='*', color='black', ms=10)
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import plotly
+
+
+
+
+
+# # print(fig)
+# # plotly.export(p = fig,file = "graph 1.png")
+# fig = make_subplots(1,2)
+
+# # add first bar trace at row = 1, col = 1
+# fig.add_trace(go.Bar(x=df['Date'], y=df['Daily'],
+#                      name='Daily Rainfall Amount',
+#                      marker_color = 'blue',
+#                      opacity=0.8,
+#                      marker_line_color='rgb(8,48,107)',
+#                      marker_line_width=2),
+#               row = 1, col = 1)
+
+
+# fig.add_trace(go.Line(x=df['Date'], y=df['LTA'],
+#                      name='Long Term Average Rainall',
+#                      marker_color = 'red',
+#                      opacity=1.0,
+#                      marker_line_color='rgb(8,48,107)',
+#                     marker_line_width=2),
+#               row = 1, col = 1)
+
+
+import plotly.express as px
+
+
+fig = px.line(x=df['Date'], y=df['LTA'],
+             labels=dict(x="Date", y="Rainfall Amount(mm)",name="Long Term Average Rainfall"))
+fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
+fig.show()
