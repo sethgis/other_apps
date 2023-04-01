@@ -1,0 +1,461 @@
+---
+title: "Crop Development Report 2"
+author: "Seth Nyawacha"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    fig_caption: yes
+    number_sections: yes
+    keep_md: yes
+  pdf_document:
+    toc: yes
+    number_sections: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+knitr::include_graphics("logo.png")
+```
+
+
+
+# Crop Development Report 2
+
+   **Project Summary,**
+   **Client:** ``WFP Kitui,``
+   **Insurance Type:** ``Group Crop Yield Insurance,``
+   **Project Area:** ``Kitui County, Kenya,``
+
+   **Covered Crop:** ``Cow peas, Green Grams, Sorghum or Millet Crops,``
+   **Coverage Period:** ``2022 Short Rains,``
+   **Type of Survey:** ``Hybrid (Field Visits + Remote Sensing).``
+
+
+Crop Development Report 2, entails the assessment of in-season crop condition during the maturity stage. 
+The assessment period spans from vegetative stage of crop to maturity stage.
+This is done to inform on the crop health and condition at the time of crop cut exercises (CCE) through farmer field survey.
+The responses from the field are blended with remote sensing assessment based on the long term average rainfall (LTA), and 
+the received rainfall amount in that specific season. CDR2 goal is to ascertain the presence of the following perils:
+
+         . Drought peril and as a catalyst to pest and diseases.
+         . Flood peril
+
+
+## Background to yield assessment
+
+Crop yield can be influenced by many factors, 
+among them is the climatic variability throughout a 
+given season. While climatic or varying weather 
+patterns may affect crop maturity and production at 
+the end of the season, some crops thrive in harsh 
+conditions while others need a stabilized climatic pattern. 
+In order to ascertain the projected crop condition, 
+probability of operational hazards affecting crop production and 
+ultimately crop yield, besides the application of remote sensing in 
+monitoring the in-season crop condition using derived satellite 
+vegetation indices, PULA Advisors carries out farmer sampling through a 
+phone interview or field survey to sampled/insured farmers within the unit area of insurance(UAI). 
+The sampled farmers are contacted throughout a unit of insurance,their crop conditions and health verified. 
+The collected information is harmonized with satellite observation throughout the 
+season and used to inform and project the probability of crop yield in terms of production 
+compared to the long term crop yield average. This report therefore is as a result of remote 
+sensing analysis, that assessed the climate condition across the season as will be discussed.
+
+
+## Crops Phenological Requirements
+
+Crops' phenological processes can be interpreted as crop growth stages. 
+Different crop stages have different sets of requirements, and these requirements define 
+how well a crop will perform in terms of yield. The main requirements include favorable climatic 
+conditions ( such as rains, temperature and evapotranspiration) that are key to crop performance 
+at the end of the season. Different crops have different needs, especially on the amount of water needed. 
+The table below summarizes the crop water needs for the insured crops.
+
+
+Water requirements double as the crop approaches the vegetative stage from the relatively low water requirements in the germination stage. 
+Thus, the vegetative stage presents the most critical stage for crop growth, where the amount of water needed is critical 
+to developing starch and proteins in preparation for maturity and harvest. Generally, water requirements 
+in crops will reduce as the crops approach maturity stage, however, depending on the amount of growth days for each particular crop, 
+the amount of water requirement at the vegetative stage may vary. 
+
+However, for crops to attain maximum productivity, 
+the amount of rainfall required should also be distributed across the crop growing days, 
+and many consecutive dry days should be avoided. When rainfall days do not match the crop growing days, 
+crops face water shortages and their health is compromised mid-season as well as during the maturity stage.
+During crop growing stages, crops that receive more water content than is required, may be affected by floods/water logging.  
+On the other hand, when crops receive less water than required or the amount of water lost from the soil is higher than the 
+amount received and retained altogether, crops suffer acute water shortages, and thus a drought and crop stress peril is experienced. 
+Other perils also  include abrupt high temperatures, pests, and diseases, among others.
+
+
+### Balancing the crop growing equation
+
+The crop growing equation is a simple mode of describing how different variables including climatic, agro-edaphic factors, 
+farm practices and seed type/variety balance out to provide a mature and ready to harvest crop.
+Most of these factors cannot be controlled, this is inclusive of factors such as climatic conditions, pests and diseases. 
+The rest of the factors that contain the agro-edaphic factors such as soil nutrient content, slope and farm practices have 
+been controlled in the past, 
+and the availability of information to control the agro-edaphic factors can contribute immensely to crop success. 
+Farm practices are informed by the cultural behavior, which has since shifted with time, based on crop performance. 
+Thus, farm practices can also be standardized to ensure and enhance productivity, based on the type of crops grown within a particular season.
+Although the mentioned factors above contribute immensely to crop production, climatic factors such as rains, temperature and
+evapotranspiration still remain major contributors to crop production. Their occurrence and pattern affect how crops perform, 
+as they affect the amount of water that is left for crop consumption. From their historical assessment, perils such as floods 
+and droughts can be assessed and the extent of their effect on crops monitored, and thereby influencing insights for decision 
+making pertaining to indemnifications. The three factors to consider when assessing the crop growth journey and production states that:
+Ideally, the amount of rainfall should not be more/less than that required by a certain crop, or should be within a required amount.
+The amount of soil moisture absorbed or retained by the soil should be adequate to sustain crop growth till the next rainfall day.
+The crop growing days should not be less than the required growing days by a certain crop as influenced by climatic conditions. 
+Ideally, the crop growing days is defined as the number of rainfall days,i.e, days where the amount of rainfall is higher than the 
+amount of water lost through evaporation.
+The above 3 factors necessitate PULA to be able to assess the effect of operational perils, first as a projected baseline 
+information through the Crop Development Report, and the assessment of loss to identify statistics that payouts can be based on. 
+The next phase highlights results from the assessment of climatic variables on crop health at different stages.
+
+
+## Remote Sensing Assessment
+
+```{python echo=FALSE}
+import ee
+import datetime
+import folium
+import params
+import os
+import subprocess
+
+# Import the matplotlib.pyplot module.
+import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+import numpy as np
+import requests
+# import pillow
+from PIL import Image
+import shutil
+import urllib
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import pandas as pd
+
+from scipy import optimize
+
+try:
+    import geemap
+except ImportError:
+    print('geemap package not installed. Installing ...')
+    subprocess.check_call(["python", '-m', 'pip', 'install', 'geemap'])
+
+
+MODEL = os.path.dirname(os.path.abspath("__file__"))
+
+ppk_file = os.path.join(MODEL, "service_account.json")
+
+service_account = "seth-311@seth-1568964691342.iam.gserviceaccount.com"
+
+private_key = "service_account.json"
+
+credentials = ee.ServiceAccountCredentials(service_account, private_key)
+ee.Initialize(credentials)
+
+	
+import warnings
+warnings.filterwarnings('ignore')
+
+
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR_BOUNDARIES/KE_Admin_Level_1')
+table1 = table.geometry()
+
+months = ee.List.sequence(1, 360, 5)
+
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2023-12-31'))
+
+def function2(m):
+    return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
+    .mean().set('day_of_year', m).set('system:time_start', sst.get('system:time_start'))
+    
+LTA = ee.ImageCollection.fromImages(months.map(function2))
+
+DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+        .filterDate(ee.Date('2022-01-01'), ee.Date('2022-12-31'))
+ 
+    
+
+BANDS = DAILY.toBands()
+LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/Machakos')
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+series = BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series = series.getInfo()
+
+
+
+
+EVI_anom = np.array(list(dic_series['features'][0]['properties'].values()))
+# print(EVI_anom)
+array1 = pd.DataFrame(EVI_anom).reset_index()
+
+
+
+
+series2 = LTA_BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series2 = series2.getInfo()
+
+
+# dic_series2
+EVI_anom2 = np.array(list(dic_series2['features'][0]['properties'].values()))
+# print(EVI_anom)
+array2 = pd.DataFrame(EVI_anom2).reset_index()
+
+
+
+
+import datetime
+import pandas as pd
+ 
+# initializing date
+test_date = datetime.datetime.strptime("01-01-2022", "%d-%m-%Y")
+ 
+
+K = 366
+ 
+date_generated = pd.date_range(test_date, periods=K)
+
+
+
+date_gen = date_generated[::5]
+
+date_frame = (pd.DataFrame(date_gen)).reset_index()
+
+
+merged = pd.merge(pd.merge(array1,array2,on='index'),date_frame,on='index')
+
+
+
+
+
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+  
+merged2 = merged
+# merged2.columns()
+merged3 = merged2.rename(columns = {'0_x':'Daily', '0_y':'LTA',0:'Date' })
+
+
+df2 = merged3.iloc[:-2 , :]
+
+
+df2['Daily']=df2['Daily'].astype(float)
+df2['LTA']=df2['LTA'].astype(float)
+
+df = df2
+
+# df2['LTA'].plot(kind='line', marker='*', color='black', ms=10)
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import plotly
+
+
+
+
+
+# # print(fig)
+# # plotly.export(p = fig,file = "graph 1.png")
+# fig = make_subplots(1,2)
+
+# # add first bar trace at row = 1, col = 1
+# fig.add_trace(go.Bar(x=df['Date'], y=df['Daily'],
+#                      name='Daily Rainfall Amount',
+#                      marker_color = 'blue',
+#                      opacity=0.8,
+#                      marker_line_color='rgb(8,48,107)',
+#                      marker_line_width=2),
+#               row = 1, col = 1)
+
+
+# fig.add_trace(go.Line(x=df['Date'], y=df['LTA'],
+#                      name='Long Term Average Rainall',
+#                      marker_color = 'red',
+#                      opacity=1.0,
+#                      marker_line_color='rgb(8,48,107)',
+#                     marker_line_width=2),
+#               row = 1, col = 1)
+
+
+import plotly.express as px
+
+
+fig = px.line(x=df['Date'], y=df['LTA'],
+             labels=dict(x="Date", y="Rainfall Amount(mm)", name="Long Term Average Rainfall"))
+fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
+
+# fig.show()
+
+
+```
+
+
+As observed in the rainfall chat above, daily rainfall amount tends to be higher than the long terms average rainfall shown in the line plots. These region however, presents adequate rainfall amounts, that can support crop growth to its maturity. However, care should be taken against water logging tendencies on some specific crops such as beans among others crops.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+library(rgee)
+
+
+nc<-ee$FeatureCollection('projects/ee-snyawacha/assets/Machakos')
+# nc
+
+
+# NDVI <- ee$ImageCollection('MODIS/061/MOD13A2') %>%
+#       ee$ImageCollection$filterDate('2022-10-01', '2023-01-30') %>% 
+#       ee$ImageCollection$select('NDVI')
+      
+#Map$addLayer(NDVI,{},'NDVI')
+
+#fc <- ee$FeatureCollection("TIGER/2018/States")$
+#filter(ee$Filter$eq("STUSPS", "MN"))
+
+#306466,#9cab68,#cccc66,#9c8448,#6e462c
+
+# Create a Landsat 7, median-pixel composite for Spring of 2000.
+collection <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2020-05-01", "2020-10-31")$
+  filterBounds(nc)
+image1 <- collection$median()
+Map$centerObject(nc,9)
+
+ndviViz <- list(
+  palette = c("00FFFF", "0000FF", "306466", "cccc66", "9c8448")
+)
+
+Map$addLayer(image1$clip(nc),ndviViz,'Vegetation Cover')
+
+```
+
+Vegetation cover in Kakamega forest tends to be stable for the monitored month, with most areas showing minimal change. The region tends to receive high rainfall as well, which immensely contribute to the greenery being experienced as depicted in the figure above.
+
+
+
+
+```{r echo=FALSE, fig.height=200, fig.width=250, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+library(sf)
+library(raster)
+library(rgdal)
+library(spam)
+library(viridis)
+library(viridisLite)
+library(fields)
+library(raster)
+library(fields)
+library(unikn)
+library(sp)
+lib_names=c("raster","ggplot2","unikn",
+            "gridExtra","rgdal","fields",
+            "RColorBrewer","ncdf4","rasterVis","rgeos","reshape2","maps")
+library(lattice)
+library(rasterVis)
+library(RColorBrewer)
+library(AOI)
+library(sf)
+library(sf)
+library(ggplot2)
+library(latticeExtra)  
+library(latticeExtra)
+library(leaflet)
+library(lattice)
+library(survival)
+library(Formula)
+library(ggplot2)
+library(Hmisc)
+
+
+# Import the shapefile of global IPCC climate reference regions (only for land) 
+IPCC_shp = readOGR("gadm41_KEN_1.shp",verbose = FALSE)
+# View attribute table of the shapefile
+
+
+sub_ras_brick<-stack('BBOX_CDR_2.tif')
+
+
+
+brick<-sub_ras_brick[[10:13]]
+
+
+
+names(brick)<-c('October 2022','November 2022','December 2022','January 2023')
+
+
+
+
+ 
+
+mapTheme = rasterTheme(region = brewer.pal(10,"Spectral")) # Set raster theme (color etc.)
+my.at=seq(-1,1,0.1)                               # Set colorkey/ colorbar sequence
+myColorkey = list(at=my.at, space="right")        # Set colorkey/colorbar to the right
+
+plt= rasterVis::levelplot(brick,   # Select first 4 raster layers to plot
+                          margin = T,          
+                          pretty=TRUE,             
+                          layout=c(2,2),
+                        # Layout of the plots
+                          row.values=2,            # Number of rows
+                          par.settings = mapTheme, # Add user define theme
+                          colorkey=myColorkey,      # Add user defined 
+                          main=c('Drought and Flood Index Map'))
+plt=plt + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1, labels= c('November','October','January','December')))  
+print(plt)
+
+
+
+
+plt= rasterVis::levelplot(sub_ras_brick[[1:4]],main="SPI PLOTS")
+
+plt=plt + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1)) # Add coastline to the plots
+
+
+
+
+
+
+```
+
+The near normal conditions continued across the insured areas except western and central part of Kenya recording rainfall above average conditions. However, towards the end of November, the Western Part and Central recorded normal conditions while the Southern Eastern part recorded higher rainfall amounts than normal. However, the average rainfall distribution was not so different from the expected rainfall amounts.
+
+In December, part of the Southern Part continued receiving slightly above normal rainfall, showing a possibility of water logging, however, in the end of December, the rainfall pattern in the Southern area stabilized, to moderately dry as the crops approached maturity. The western part, however, recorded very high rainfall above normal towards the end of December.
+
+
+
+
+
+## Conclusion and Recomendations
+
+
+According to the assessment above, most insured areas are showing normal conditions across the season, with minimal areas showing a slight deviation from the normal either by being dry or slightly wet than expected. However, the season did not record very extreme values that could cause widespread effects of peril on crops. As much as there is a possibility of farmers complaining, especially from the Western part of Kenya, of the effects of water logging, the conditions did not last for long, thus the season corrected itself. More assessment will be done to validate the remote sensing findings during cro cut exercises.
+
+
