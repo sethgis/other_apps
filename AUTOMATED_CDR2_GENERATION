@@ -72,11 +72,11 @@ conn = psycopg2.connect("host=pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazona
 # Create a cursor object
 cur = conn.cursor()
 
-# Username: seth_pas_ro
-# Password: KY5ji83f&k(7YH1
-# Database: pas-prod-mavuno or pas-staging-mavuno
-# Host: pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazonaws.com
-# Port: 5432
+# Username: 
+# Password:
+# Database: 
+# Host: 
+# Port: 
 
 cur.execute("""select cce_id, common_questionnaireresponse.responses->'q_row_spacing' as q_row_spacing,  
 common_questionnaireresponse.responses->'q_planting_date' as Planting_Date,
@@ -134,11 +134,7 @@ conn = psycopg2.connect("host=pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazona
 # Create a cursor object
 cur = conn.cursor()
 
-# Username: seth_pas_ro
-# Password: KY5ji83f&k(7YH1
-# Database: pas-prod-mavuno or pas-staging-mavuno
-# Host: pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazonaws.com
-# Port: 5432
+
 
 cur.execute("""select cce_id, common_questionnaireresponse.responses->'q_row_spacing' as q_row_spacing,  
 common_questionnaireresponse.responses->'q_planting_date' as Planting_Date,
@@ -309,7 +305,7 @@ MODEL = os.path.dirname(os.path.abspath("__file__"))
 
 ppk_file = os.path.join(MODEL, "service_account.json")
 
-service_account = "seth-311@seth-1568964691342.iam.gserviceaccount.com"
+service_account = ""
 
 private_key = "service_account.json"
 
