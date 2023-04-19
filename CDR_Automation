@@ -1,6 +1,6 @@
 ---
 title: "Crop Development Report 2"
-author: "Seth Nyawacha"
+author: "Pula Advisors - CDRs"
 date: "`r Sys.Date()`"
 always_allow_html: yes
 output:
@@ -23,15 +23,21 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r echo=FALSE, fig.height=1.5, fig.width=2.0, message=FALSE, warning=FALSE, paged.print=FALSE}
 knitr::include_graphics("logo.png")
 ```
 
+```{r echo=FALSE, fig.height=6, fig.width=3.5, message=FALSE, warning=FALSE, paged.print=FALSE}
+knitr::include_graphics("cropp.png")
+```
+
+\newpage
+
 # Crop Development Report 2
 
-**Project Summary,** **Client:** `WFP Kitui,` **Insurance Type:** `Group Crop Yield Insurance,` **Project Area:** `Kitui County, Kenya,`
+**Project Summary,** **Client:** `WFP Kitui,` **Insurance Type:** `Group Crop Yield Insurance,` **Project Area:** `Kitui County, Kenya`
 
-**Covered Crop:** `Cow peas, Green Grams, Sorghum or Millet Crops,` **Coverage Period:** `2022 Short Rains,` **Type of Survey:** `Hybrid (Field Visits + Remote Sensing).`
+**Covered Crop:** `Cow peas, Green Grams, Sorghum and Millet,` **Coverage Period:** `2022 Short Rains,` **Type of Survey:** `Hybrid (Field Visits + Remote Sensing).`
 
 Crop Development Report 2, entails the assessment of in-season crop condition during the maturity stage. The assessment period spans from vegetative stage of crop to maturity stage. This is done to inform on the crop health and condition at the time of crop cut exercises (CCE) through farmer field survey. The responses from the field are blended with remote sensing assessment based on the long term average rainfall (LTA), and the received rainfall amount in that specific season. CDR2 goal is to ascertain the presence of the following perils:
 
@@ -55,13 +61,23 @@ On the other hand, when crops receive less water than required or the amount of 
 
 The crop growing equation is a simple mode of describing how different variables including climatic, agro-edaphic factors, farm practices and seed type/variety balance out to provide a mature and ready to harvest crop. Most of these factors cannot be controlled, this is inclusive of factors such as climatic conditions, pests and diseases. The rest of the factors that contain the agro-edaphic factors such as soil nutrient content, slope and farm practices have been controlled in the past, and the availability of information to control the agro-edaphic factors can contribute immensely to crop success. Farm practices are informed by the cultural behavior, which has since shifted with time, based on crop performance. Thus, farm practices can also be standardized to ensure and enhance productivity, based on the type of crops grown within a particular season. Although the mentioned factors above contribute immensely to crop production, climatic factors such as rains, temperature and evapotranspiration still remain major contributors to crop production. Their occurrence and pattern affect how crops perform, as they affect the amount of water that is left for crop consumption. From their historical assessment, perils such as floods and droughts can be assessed and the extent of their effect on crops monitored, and thereby influencing insights for decision making pertaining to indemnifications. The three factors to consider when assessing the crop growth journey and production states that: Ideally, the amount of rainfall should not be more/less than that required by a certain crop, or should be within a required amount. The amount of soil moisture absorbed or retained by the soil should be adequate to sustain crop growth till the next rainfall day. The crop growing days should not be less than the required growing days by a certain crop as influenced by climatic conditions. Ideally, the crop growing days is defined as the number of rainfall days,i.e, days where the amount of rainfall is higher than the amount of water lost through evaporation. The above 3 factors necessitate PULA to be able to assess the effect of operational perils, first as a projected baseline information through the Crop Development Report, and the assessment of loss to identify statistics that payouts can be based on. The next phase highlights results from the assessment of climatic variables on crop health at different stages.
 
+\newpage
+
 ## Field Assessment
 
-Field data assessment was collected at the on set of crop cut exercises to the insured farmers. The assesment focused on summarizing the effect of perils on farmers. The figures below summarises ground information.
+Field data is collected at the on set of crop cut exercises to the insured farmers. The assessment focused on summarizing the effect of perils on farmers. The figures below summarises farmer responses and conditions based on field observation.
 
 ```{python echo=FALSE}
 import psycopg2
 import matplotlib. pyplot as plt
+
+
+import numpy as np
+from matplotlib import pyplot as plt
+import warnings
+
+plt.rcParams["figure.autolayout"] = True
+warnings.filterwarnings("ignore")
 
 # Replace the values in the following string with your database credentials
 # conn = psycopg2.connect("host=pulaips-instance-1.cb0ckdnatyiy.eu-west-1.rds.amazonaws.com port=5432 dbname=pas-prod-mavuno  user=korir_ro password=aF29X1q99eUcdHpz")
@@ -88,7 +104,7 @@ common_questionnaireresponse.farmer_responses->'uai' as uai,
 common_project."name" 
 from common_questionnaireresponse inner join common_project on 
 common_questionnaireresponse.project_id = common_project.id 
-where common_project."name" ='AFEX Kenya';""")
+where common_project."name" ='WFP Kenya Kitui';""")
 
 # Fetch the results
 results = cur.fetchall()
@@ -103,30 +119,34 @@ import pandas as pd
 df = pd.DataFrame (results, columns= headers)
 
 
-plt.subplots(figsize=(7, 12))
-plt.subplot(2, 1, 1)
+
+
 df['flood'].value_counts().plot(kind='bar', title='Flood Effects on Count of farmers',color='blue', xlabel='Size of farm', ylabel='Count of farmers')
 
 
 
-plt.subplot(2, 1, 2)
-df['flood'].value_counts().plot(kind='pie', title='Flood Effects on Percentage of farmers')
-
-
-
-plt.tight_layout()
-plt.show()
-
-
 ```
 
-The plots shows statistics of farmers affected as a result of flood.
+\newpage
+
+```{python echo=FALSE}
+df['flood'].value_counts().plot(kind='pie', title='Flood Effects on Percentage of farmers')
+```
+
+The plots above shows statistics of farmers affected as a result of flood. Most farmers reported no effect as a result of flood. Generally, the insured area recorded a hot and dry condition, expecting a very huge effect of drought and pests on crops during the dry season.
 
 ```{python echo=FALSE}
 import psycopg2
 import matplotlib. pyplot as plt
 
+import numpy as np
+from matplotlib import pyplot as plt
+import warnings
 
+plt.rcParams["figure.autolayout"] = True
+warnings.filterwarnings("ignore")
+import warnings
+warnings.filterwarnings('ignore')
 
 
 conn = psycopg2.connect("host=pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazonaws.com port=5432 dbname=pas-prod-mavuno  user=seth_pas_ro password=KY5ji83f&k(7YH1")
@@ -150,7 +170,7 @@ common_questionnaireresponse.farmer_responses->'uai' as uai,
 common_project."name" 
 from common_questionnaireresponse inner join common_project on 
 common_questionnaireresponse.project_id = common_project.id 
-where common_project."name" ='AFEX Kenya';""")
+where common_project."name" ='WFP Kenya Kitui';""")
 
 # Fetch the results
 results = cur.fetchall()
@@ -171,33 +191,39 @@ import pandas as pd
 df = pd.DataFrame (results, columns= headers)
 
 
-plt.subplots(figsize=(7, 12))
-plt.subplot(2, 1, 1)
+
+
 df['drought'].value_counts().plot(kind='bar', title='Drought Effect on Count of farmers',color='red',  xlabel='Size of farm', ylabel='Count of farmers')
 
-plt.subplot(2, 1, 2)
-mylabels = ["None","0-25%","25-50%","75-100%"]
-# plt.setp(size=8, weight="bold")
-df['drought'].value_counts().plot(kind='pie', title='Drought Effects on Percentage of farmers',xlabel='Size of farm', ylabel='Count of farmers')
 
 
 
-# plt.xlabel('Size of farm ')
-# plt.ylabel('Count of farmers ')
-plt.tight_layout()
-plt.show()
 
-# Index(['cce_id', 'q_row_spacing', 'planting_date', 'distance_to_water_body',
-#        'flood', 'drought', 'pests_and_diseases', 'uai', 'name'],
-#       dtype='object')
+
+
 ```
 
+```{python echo=FALSE}
+mylabels = ["None","0-25%","25-50%","75-100%"]
 
+df['drought'].value_counts().plot(kind='pie', title='Drought Effects on Percentage of farmers',xlabel='Size of farm', ylabel='Count of farmers')
+```
+
+Drought conditions also affected a majority of farmers, at varying scales, as represented in the graph above.
+
+\newpage
 
 ```{python echo=FALSE}
 #The data printed out is in a list format, for further analysis, transform it into a dataframe.
 import psycopg2
 import matplotlib. pyplot as plt
+
+import numpy as np
+from matplotlib import pyplot as plt
+import warnings
+
+plt.rcParams["figure.autolayout"] = True
+warnings.filterwarnings("ignore")
 
 # Replace the values in the following string with your database credentials
 # conn = psycopg2.connect("host=pulaips-instance-1.cb0ckdnatyiy.eu-west-1.rds.amazonaws.com port=5432 dbname=pas-prod-mavuno  user=korir_ro password=aF29X1q99eUcdHpz")
@@ -224,7 +250,7 @@ common_questionnaireresponse.farmer_responses->'uai' as uai,
 common_project."name" 
 from common_questionnaireresponse inner join common_project on 
 common_questionnaireresponse.project_id = common_project.id 
-where common_project."name" ='AFEX Kenya';""")
+where common_project."name" ='WFP Kenya Kitui';""")
 
 # Fetch the results
 results = cur.fetchall()
@@ -244,31 +270,26 @@ headers = [i[0] for i in cur.description]
 import pandas as pd
 df = pd.DataFrame (results, columns= headers)
 
+df['pests_and_diseases'].value_counts().plot(kind='bar', title='Pests Effect on Count of farmers',color='red',  xlabel='Size of farm', ylabel='Count of farmers')
 
-plt.subplots(figsize=(7, 12))
-plt.subplot(2, 1, 1)
-df['drought'].value_counts().plot(kind='bar', title='Drought Effect on Count of farmers',color='red',  xlabel='Size of farm', ylabel='Count of farmers')
-
-plt.subplot(2, 1, 2)
-mylabels = ["None","0-25%","25-50%","75-100%"]
-# plt.setp(size=8, weight="bold")
-df['drought'].value_counts().plot(kind='pie', title='Drought Effects on Percentage of farmers')
-
-
-
-# plt.xlabel('Size of farm ')
-# plt.ylabel('Count of farmers ')
-plt.tight_layout()
-plt.show()
-
-# Index(['cce_id', 'q_row_spacing', 'planting_date', 'distance_to_water_body',
-#        'flood', 'drought', 'pests_and_diseases', 'uai', 'name'],
-#       dtype='object')
 ```
 
+```{python echo=FALSE}
 
+mylabels = ["None","0-25%","25-50%","75-100%"]
+df['pests_and_diseases'].value_counts().plot(kind='pie', title='Pests Effects on Percentage of farmers')
+
+```
+
+As observed, pest and diseases had a devastating effect on crops. Many farmers complained of pest effect as represented on the graphs above.
+
+\newpage
 
 ## Remote Sensing Assessment
+
+The rainfall trend shows a comparison between the long term average(expected rainfall amount(LTA)), with the received rainfall amount, observed every 5 days. Whenever the blue line representing LTA is higher than the bar graph, crops are experiencing water stress conditions, while a prolonged received rainfall shows crops are in the verge of experiencing water logging conditions.
+
+Rainfall Trend for AEZ 4
 
 ```{python echo=FALSE}
 import ee
@@ -321,13 +342,13 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR_BOUNDARIES/KE_Admin_Level_1')
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR2_AUTOMATION')
 table1 = table.geometry()
 
-months = ee.List.sequence(1, 360, 5)
+months = ee.List.sequence(180, 360, 2)
 
-sst = ee.ImageCollection('UCSB-CHG/CHIRPS/DAILY')\
-    .filterDate(ee.Date('2018-01-01'), ee.Date('2023-12-31'))
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2022-12-31'))
 
 def function2(m):
     return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
@@ -336,13 +357,13 @@ def function2(m):
 LTA = ee.ImageCollection.fromImages(months.map(function2))
 
 DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
-        .filterDate(ee.Date('2022-01-01'), ee.Date('2022-12-31'))
+        .filterDate(ee.Date('2022-07-01'), ee.Date('2022-12-31'))
  
     
 
 BANDS = DAILY.toBands()
 LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
-AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/Machakos')
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/KENYA_AEZ').filter(ee.Filter.inList('NAME', ['4']))
 
 
 
@@ -387,10 +408,10 @@ import datetime
 import pandas as pd
  
 # initializing date
-test_date = datetime.datetime.strptime("01-01-2022", "%d-%m-%Y")
+test_date = datetime.datetime.strptime("01-07-2022", "%d-%m-%Y")
  
 
-K = 366
+K = 180
  
 date_generated = pd.date_range(test_date, periods=K)
 
@@ -432,6 +453,8 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import plotly
+import warnings
+warnings.filterwarnings('ignore')
 
 
 
@@ -472,48 +495,626 @@ fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
 
 ```
 
-As observed in the rainfall chat above, daily rainfall amount tends to be higher than the long terms average rainfall shown in the line plots. These region however, presents adequate rainfall amounts, that can support crop growth to its maturity. However, care should be taken against water logging tendencies on some specific crops such as beans among others crops.
+Rainfall Trend for AEZ 1
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{python echo=FALSE}
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR2_AUTOMATION')
+table1 = table.geometry()
+
+months = ee.List.sequence(180, 360, 2)
+
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2022-12-31'))
+
+def function2(m):
+    return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
+    .mean().set('day_of_year', m).set('system:time_start', sst.get('system:time_start'))
+    
+LTA = ee.ImageCollection.fromImages(months.map(function2))
+
+DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+        .filterDate(ee.Date('2022-07-01'), ee.Date('2022-12-31'))
+ 
+    
+
+BANDS = DAILY.toBands()
+LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/KENYA_AEZ').filter(ee.Filter.inList('NAME', ['1']))
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+series = BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series = series.getInfo()
+
+
+
+
+EVI_anom = np.array(list(dic_series['features'][0]['properties'].values()))
+# print(EVI_anom)
+array1 = pd.DataFrame(EVI_anom).reset_index()
+
+
+
+
+series2 = LTA_BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series2 = series2.getInfo()
+
+
+# dic_series2
+EVI_anom2 = np.array(list(dic_series2['features'][0]['properties'].values()))
+# print(EVI_anom)
+array2 = pd.DataFrame(EVI_anom2).reset_index()
+
+
+
+
+import datetime
+import pandas as pd
+ 
+# initializing date
+test_date = datetime.datetime.strptime("01-07-2022", "%d-%m-%Y")
+ 
+
+K = 180
+ 
+date_generated = pd.date_range(test_date, periods=K)
+
+
+
+date_gen = date_generated[::5]
+
+date_frame = (pd.DataFrame(date_gen)).reset_index()
+
+
+merged = pd.merge(pd.merge(array1,array2,on='index'),date_frame,on='index')
+
+
+
+
+
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+  
+merged2 = merged
+# merged2.columns()
+merged3 = merged2.rename(columns = {'0_x':'Daily', '0_y':'LTA',0:'Date' })
+
+
+df2 = merged3.iloc[:-2 , :]
+
+
+df2['Daily']=df2['Daily'].astype(float)
+df2['LTA']=df2['LTA'].astype(float)
+
+df = df2
+
+# df2['LTA'].plot(kind='line', marker='*', color='black', ms=10)
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import plotly
+import warnings
+warnings.filterwarnings('ignore')
+
+
+
+
+
+# # print(fig)
+# # plotly.export(p = fig,file = "graph 1.png")
+# fig = make_subplots(1,2)
+
+# # add first bar trace at row = 1, col = 1
+# fig.add_trace(go.Bar(x=df['Date'], y=df['Daily'],
+#                      name='Daily Rainfall Amount',
+#                      marker_color = 'blue',
+#                      opacity=0.8,
+#                      marker_line_color='rgb(8,48,107)',
+#                      marker_line_width=2),
+#               row = 1, col = 1)
+
+
+# fig.add_trace(go.Line(x=df['Date'], y=df['LTA'],
+#                      name='Long Term Average Rainall',
+#                      marker_color = 'red',
+#                      opacity=1.0,
+#                      marker_line_color='rgb(8,48,107)',
+#                     marker_line_width=2),
+#               row = 1, col = 1)
+
+
+import plotly.express as px
+
+
+fig = px.line(x=df['Date'], y=df['LTA'],
+             labels=dict(x="Date", y="Rainfall Amount(mm)", name="Long Term Average Rainfall"))
+fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
+
+```
+
+\newpage
+
+Rainfall Trend for AEZ 11
+
+```{python echo=FALSE}
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR2_AUTOMATION')
+table1 = table.geometry()
+
+months = ee.List.sequence(180, 360, 2)
+
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2022-12-31'))
+
+def function2(m):
+    return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
+    .mean().set('day_of_year', m).set('system:time_start', sst.get('system:time_start'))
+    
+LTA = ee.ImageCollection.fromImages(months.map(function2))
+
+DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+        .filterDate(ee.Date('2022-07-01'), ee.Date('2022-12-31'))
+ 
+    
+
+BANDS = DAILY.toBands()
+LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/KENYA_AEZ').filter(ee.Filter.inList('NAME', ['11']))
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+series = BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series = series.getInfo()
+
+
+
+
+EVI_anom = np.array(list(dic_series['features'][0]['properties'].values()))
+# print(EVI_anom)
+array1 = pd.DataFrame(EVI_anom).reset_index()
+
+
+
+
+series2 = LTA_BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series2 = series2.getInfo()
+
+
+# dic_series2
+EVI_anom2 = np.array(list(dic_series2['features'][0]['properties'].values()))
+# print(EVI_anom)
+array2 = pd.DataFrame(EVI_anom2).reset_index()
+
+
+
+
+import datetime
+import pandas as pd
+import warnings
+warnings.filterwarnings('ignore')
+ 
+# initializing date
+test_date = datetime.datetime.strptime("01-07-2022", "%d-%m-%Y")
+ 
+
+K = 180
+ 
+date_generated = pd.date_range(test_date, periods=K)
+
+
+
+date_gen = date_generated[::5]
+
+date_frame = (pd.DataFrame(date_gen)).reset_index()
+
+
+merged = pd.merge(pd.merge(array1,array2,on='index'),date_frame,on='index')
+
+
+
+
+
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+  
+merged2 = merged
+# merged2.columns()
+merged3 = merged2.rename(columns = {'0_x':'Daily', '0_y':'LTA',0:'Date' })
+
+
+df2 = merged3.iloc[:-2 , :]
+
+
+df2['Daily']=df2['Daily'].astype(float)
+df2['LTA']=df2['LTA'].astype(float)
+
+df = df2
+
+# df2['LTA'].plot(kind='line', marker='*', color='black', ms=10)
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import plotly
+import warnings
+warnings.filterwarnings('ignore')
+
+
+
+
+
+# # print(fig)
+# # plotly.export(p = fig,file = "graph 1.png")
+# fig = make_subplots(1,2)
+
+# # add first bar trace at row = 1, col = 1
+# fig.add_trace(go.Bar(x=df['Date'], y=df['Daily'],
+#                      name='Daily Rainfall Amount',
+#                      marker_color = 'blue',
+#                      opacity=0.8,
+#                      marker_line_color='rgb(8,48,107)',
+#                      marker_line_width=2),
+#               row = 1, col = 1)
+
+
+# fig.add_trace(go.Line(x=df['Date'], y=df['LTA'],
+#                      name='Long Term Average Rainall',
+#                      marker_color = 'red',
+#                      opacity=1.0,
+#                      marker_line_color='rgb(8,48,107)',
+#                     marker_line_width=2),
+#               row = 1, col = 1)
+
+
+import plotly.express as px
+
+
+fig = px.line(x=df['Date'], y=df['LTA'],
+             labels=dict(x="Date", y="Rainfall Amount(mm)", name="Long Term Average Rainfall"))
+fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
+
+```
+
+Rainfall Trend for AEZ 10
+
+```{python echo=FALSE}
+table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR2_AUTOMATION')
+table1 = table.geometry()
+
+months = ee.List.sequence(180, 360, 2)
+
+sst = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+    .filterDate(ee.Date('2018-01-01'), ee.Date('2022-12-31'))
+
+def function2(m):
+    return sst.filter(ee.Filter.calendarRange(m,m, 'day_of_year'))\
+    .mean().set('day_of_year', m).set('system:time_start', sst.get('system:time_start'))
+    
+LTA = ee.ImageCollection.fromImages(months.map(function2))
+
+DAILY = ee.ImageCollection('UCSB-CHG/CHIRPS/PENTAD')\
+        .filterDate(ee.Date('2022-07-01'), ee.Date('2022-12-31'))
+ 
+    
+
+BANDS = DAILY.toBands()
+LTA_BANDS = LTA.toBands().set('system:time_start', sst.get('system:time_start'))
+AOI = ee.FeatureCollection('projects/ee-snyawacha/assets/KENYA_AEZ').filter(ee.Filter.inList('NAME', ['10']))
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+series = BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series = series.getInfo()
+
+
+
+
+EVI_anom = np.array(list(dic_series['features'][0]['properties'].values()))
+# print(EVI_anom)
+array1 = pd.DataFrame(EVI_anom).reset_index()
+
+
+
+
+series2 = LTA_BANDS.reduceRegions(collection=AOI,
+                                      reducer=ee.Reducer.mean(),
+                                      scale=100)
+
+dic_series2 = series2.getInfo()
+
+
+# dic_series2
+EVI_anom2 = np.array(list(dic_series2['features'][0]['properties'].values()))
+# print(EVI_anom)
+array2 = pd.DataFrame(EVI_anom2).reset_index()
+
+
+
+
+import datetime
+import pandas as pd
+ 
+# initializing date
+test_date = datetime.datetime.strptime("01-07-2022", "%d-%m-%Y")
+ 
+
+K = 180
+ 
+date_generated = pd.date_range(test_date, periods=K)
+
+
+
+date_gen = date_generated[::5]
+
+date_frame = (pd.DataFrame(date_gen)).reset_index()
+
+
+merged = pd.merge(pd.merge(array1,array2,on='index'),date_frame,on='index')
+
+
+
+
+
+import plotly_express as px
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+  
+merged2 = merged
+# merged2.columns()
+merged3 = merged2.rename(columns = {'0_x':'Daily', '0_y':'LTA',0:'Date' })
+
+
+df2 = merged3.iloc[:-2 , :]
+
+
+df2['Daily']=df2['Daily'].astype(float)
+df2['LTA']=df2['LTA'].astype(float)
+
+df = df2
+
+# df2['LTA'].plot(kind='line', marker='*', color='black', ms=10)
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import plotly
+import warnings
+warnings.filterwarnings('ignore')
+
+
+
+
+
+# # print(fig)
+# # plotly.export(p = fig,file = "graph 1.png")
+# fig = make_subplots(1,2)
+
+# # add first bar trace at row = 1, col = 1
+# fig.add_trace(go.Bar(x=df['Date'], y=df['Daily'],
+#                      name='Daily Rainfall Amount',
+#                      marker_color = 'blue',
+#                      opacity=0.8,
+#                      marker_line_color='rgb(8,48,107)',
+#                      marker_line_width=2),
+#               row = 1, col = 1)
+
+
+# fig.add_trace(go.Line(x=df['Date'], y=df['LTA'],
+#                      name='Long Term Average Rainall',
+#                      marker_color = 'red',
+#                      opacity=1.0,
+#                      marker_line_color='rgb(8,48,107)',
+#                     marker_line_width=2),
+#               row = 1, col = 1)
+
+
+import plotly.express as px
+
+fig, ax = plt.subplots(figsize=(10,6))
+fig = px.line(x=df['Date'], y=df['LTA'],
+             labels=dict(x="Date", y="Rainfall Amount(mm)", name="Long Term Average Rainfall"))
+fig.add_bar(x=df['Date'], y=df['Daily'], name="Daily Rainfall")
+
+```
+
+Based on the rainfall assessment in the above AEZs, the short rain season rainfall amount, seemed to be lower than the expected rainfall amount. The expected rainfall amount is represented by Long Term Average Rainfall (LTA) aggregated over the years. When the LTA rainfall and long term rainfall are compared, generally, crops in these areas underwent massive water stress across the season.\
+
+\newpage
+
+#### Vegetation Health Trend in insured areas for WFP Kitui
+
+The maps below shows the relative vegetation health for the insured areas, with red regions showing a tendency of unhealthy vegetation, and green regions shows a tendency of very healthy vegetation. When vegetation maps shows regions with yellow to brown colour code, shows areas being affected by some level of crop stress, thus farmers in these region may harvest as well as affected by operational peril to some extent.
+
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
 
 library(rgee)
 
 
-nc<-ee$FeatureCollection('projects/ee-snyawacha/assets/Machakos')
-# nc
+#nc<-ee$FeatureCollection('projects/ee-snyawacha/assets/Lowe_Easter')
 
+nc <- ee$FeatureCollection('projects/ee-snyawacha/assets/WFP_KITUI_CDR2')
 
-# NDVI <- ee$ImageCollection('MODIS/061/MOD13A2') %>%
-#       ee$ImageCollection$filterDate('2022-10-01', '2023-01-30') %>% 
-#       ee$ImageCollection$select('NDVI')
-      
-#Map$addLayer(NDVI,{},'NDVI')
-
-#fc <- ee$FeatureCollection("TIGER/2018/States")$
-#filter(ee$Filter$eq("STUSPS", "MN"))
-
-#306466,#9cab68,#cccc66,#9c8448,#6e462c
-
-# Create a Landsat 7, median-pixel composite for Spring of 2000.
 collection <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
-  filterDate("2020-05-01", "2020-10-31")$
+  filterDate("2022-10-01", "2022-10-31")$
   filterBounds(nc)
 image1 <- collection$median()
 Map$centerObject(nc,9)
+colorizedVis <- list(min = -2000,
+  max = 10000.0, palette = c('ff3333', 'ff9966', 'cccc00', 'b3ffb3', '00cc00', '008000'))
+
+
+
+# visParams = list(
+#   min = 0.0,
+#   max = 1.0,
+#   bands = "NDVI_median",
+#   palette = c(
+#     'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718', '74A901','66A000', '529400', '3E8601', '207401', '056201', '004C00', '023B01','012E01', '011D01', '011301'
+#   )
+# )
+
+
+
 
 ndviViz <- list(
   palette = c("00FFFF", "0000FF", "306466", "cccc66", "9c8448")
 )
 
-Map$addLayer(image1$clip(nc),ndviViz,'Vegetation Cover')
+
+
+
+collection2 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2022-11-01", "2022-11-30")$
+  filterBounds(nc)
+image2 <- collection2$median()
+
+
+
+
+
+
+
+
+
+
+
+
+
+cols <- c('#ff3333', '#ff9966', '#cccc00', '#b3ffb3', '#00cc00', '#008000')
+labels <- c("Very Healthy", "Healthy", "Average", "Unhealthy","Very Unhealthy" )
+vis_qc <- list(min = -2000, max = 5000, palette = cols, values = labels)
+# Create interactive map
+
+# 
+# Map$addLayer(image5$clip(nc),colorizedVis,'February NDVI') + + Map$addLayer(image3$clip(nc),colorizedVis,'December NDVI') + 
+# Map$addLayer(image2$clip(nc),colorizedVis,'November NDVI') +
+# Map$addLayer(image1$clip(nc),colorizedVis,'October NDVI') + 
+# Map$addLegend(vis_qc)
+
+
+# Map$addLegend(vis_qc, name = "Legend", color_mapping = "discrete") +
+# continous palette
+
+
+
+
+
 
 ```
 
-Vegetation cover in Kakamega forest tends to be stable for the monitored month, with most areas showing minimal change. The region tends to receive high rainfall as well, which immensely contribute to the greenery being experienced as depicted in the figure above.
+##### October 2022 Vegetation health map
 
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
+collection3 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2022-10-01", "2022-10-30")$
+  filterBounds(nc)
 
+image3<- collection3$median()
+Map$centerObject(nc,7)
+Map$addLayer(image3$clip(nc),colorizedVis,'October NDVI')+Map$addLegend(vis_qc)
+```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+\newpage
+
+##### November 2022 Vegetation health map.
+
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
+collection3 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2022-11-01", "2022-11-30")$
+  filterBounds(nc)
+
+image3<- collection3$median()
+Map$centerObject(nc,7)
+Map$addLayer(image3$clip(nc),colorizedVis,'November NDVI')+Map$addLegend(vis_qc)
+
+```
+
+##### December 2022 Vegetation health map.
+
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+collection4 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2022-12-01", "2022-12-30")$
+  filterBounds(nc)
+
+image4<- collection4$median()
+Map$centerObject(nc,7)
+Map$addLayer(image4$clip(nc),colorizedVis,'December NDVI')+Map$addLegend(vis_qc)
+
+```
+
+\newpage
+
+##### January 2023 Vegetation health map.
+
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
+collection5 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2023-01-01", "2023-01-30")$
+  filterBounds(nc)
+
+image5<- collection5$median()
+Map$centerObject(nc,7)
+
+ Map$addLayer(image5$clip(nc),colorizedVis,'January NDVI')+Map$addLegend(vis_qc)
+
+```
+
+##### February 2023 Vegetation health map.
+
+```{r echo=FALSE, fig.height=3, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE}
+collection3 <- ee$ImageCollection("MODIS/061/MOD13A2")$select('NDVI')$
+  filterDate("2023-02-01", "2023-02-27")$
+  filterBounds(nc)
+
+image3<- collection3$median()
+Map$centerObject(nc,7)
+Map$addLayer(image3$clip(nc),colorizedVis,'February NDVI')+Map$addLegend(vis_qc)
+```
+
+Vegetation cover in the insured area tends to be experiencing some level of stress for the monitored months. This confirms the rainfall observation of water stress for an expansive insured areas. Such conditions may lead to farmers experiencing losses on their crops.
+
+```{r eval=FALSE, fig.height=5, fig.width=5, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 library(sf)
 library(raster)
 library(rgdal)
@@ -548,20 +1149,20 @@ library(Hmisc)
 # Import the shapefile of global IPCC climate reference regions (only for land) 
 IPCC_shp = readOGR("gadm41_KEN_1.shp",verbose = FALSE)
 # View attribute table of the shapefile
-head(IPCC_shp@data)
-
-sub_ras_brick<-stack('BBOX_CDR_2.tif')
 
 
-
-brick<-sub_ras_brick[[10:13]]
+sub_ras_brick<-stack('ARZIKIN.tif')
 
 
 
-names(brick)<-c('October 2022','November 2022','December 2022','January 2023')
+brick<-sub_ras_brick[[1:3]]
 
 
-labels <- layer(sp.text(coordinates(IPCC_shp), txt = IPCC_shp$NAME_1, pos = 1))
+
+
+
+
+
 
 
  
@@ -572,7 +1173,7 @@ myColorkey = list(at=my.at, space="right")        # Set colorkey/colorbar to the
 
 plt= rasterVis::levelplot(brick,   # Select first 4 raster layers to plot
                           margin = T,          
-                          pretty=TRUE,             
+                                     
                           layout=c(2,2),
                         # Layout of the plots
                           row.values=2,            # Number of rows
@@ -585,12 +1186,17 @@ print(plt)
 
 ```
 
-
-
-The near normal conditions continued across the insured areas except western and central part of Kenya recording rainfall above average conditions. However, towards the end of November, the Western Part and Central recorded normal conditions while the Southern Eastern part recorded higher rainfall amounts than normal. However, the average rainfall distribution was not so different from the expected rainfall amounts.
-
-In December, part of the Southern Part continued receiving slightly above normal rainfall, showing a possibility of water logging, however, in the end of December, the rainfall pattern in the Southern area stabilized, to moderately dry as the crops approached maturity. The western part, however, recorded very high rainfall above normal towards the end of December.
+\newpage
 
 ## Conclusion and Recommendations
 
-According to the assessment above, most insured areas are showing normal conditions across the season, with minimal areas showing a slight deviation from the normal either by being dry or slightly wet than expected. However, the season did not record very extreme values that could cause widespread effects of peril on crops. As much as there is a possibility of farmers complaining, especially from the Western part of Kenya, of the effects of water logging, the conditions did not last for long, thus the season corrected itself. More assessment will be done to validate the remote sensing findings during crop cut exercises.
+The rainfall assessment for all the AEZ shown above, shows possibility of water stress peril experienced for the better part of the season, except for AEZ 10, with water logging tendencies. Dry conditions also are a primary cause of pest and disease development on crops, due to increased temperatures. These conclusions can be made for most insured AEZs for the short rain season. The crop yield assessment will be done during crop cut exercises and included in the payout report, and will elaborate the effect of perils on payouts.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(psycModel)
+
+
+html_to_pdf(file_path = "D:/CDR2/Wind-Erosion-Modelling/source/CDR2_AUTOMATION_R.html", scale=1)
+
+
+```
