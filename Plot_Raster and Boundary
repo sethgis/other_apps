@@ -75,3 +75,93 @@ print(plt)
 
 
 labels <- layer(sp.text(coordinates(SP), txt = IPCC_shp$NAME_, pos = 1))
+
+
+
+``{r echo=FALSE, fig.height=10, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(sf)
+library(raster)
+library(rgdal)
+library(spam)
+library(viridis)
+library(viridisLite)
+library(fields)
+library(raster)
+library(fields)
+library(unikn)
+library(sp)
+lib_names=c("raster","ggplot2","unikn",
+            "gridExtra","rgdal","fields",
+            "ncdf4","rasterVis","rgeos","reshape2","maps")
+library(lattice)
+library(rasterVis)
+library(RColorBrewer)
+library(AOI)
+library(sf)
+library(sf)
+library(ggplot2)
+library(latticeExtra)  
+#library(latticeExtra)
+library(leaflet)
+library(lattice)
+library(survival)
+library(Formula)
+library(ggplot2)
+library(Hmisc)
+
+
+# Import the shapefile of global IPCC climate reference regions (only for land) 
+IPCC_shp = readOGR("gadm41_KEN_1.shp",verbose = FALSE)
+# View attribute table of the shapefile
+
+
+brick<-stack("APOLLO_2023.tif")
+
+
+
+#brick<-sub_ras_brick[[1:3]]
+
+
+
+
+names(brick)<-c('January 2023','February 2023','March 2023','April 2023')
+
+
+
+
+ 
+
+mapTheme = rasterTheme(region = brewer.pal(10,"RdYlGn"))
+
+mypalette<-brewer.pal(10,"RdYlGn")
+cols <- colorRampPalette(brewer.pal(10,"RdYlGn"))
+
+# Set raster theme (color etc.)
+my.at=seq(-1,1,0.1)                               # Set colorkey/ colorbar sequence
+myColorkey = list(at=my.at, space="right")        # Set colorkey/colorbar to the right
+
+plt=rasterVis::levelplot(brick,   # Select first 4 raster layers to plot
+                          #colorkey=myColorkey, 
+                          margin = T,          
+                          theme =  mapTheme,         
+                          layout=c(1,1),
+                          palette=mypalette,
+                          col.regions=cols,
+                          pretty=TRUE,
+                        # Layout of the plots
+                          row.values=2,            # Number of rows
+                          # Add user define theme
+                          #     # Add user defined 
+                          main=c('Drought and Flood Index Map',col.regions=cols))
+plt=plt + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1))  
+print(plt)
+
+
+#plt = levelplot(brick,
+         # layout=c(1, 1), # create a 5x3 layout for the data
+         # col.regions=cols, # add a color ramp
+          #main="Drought and Flood Index Map"
+        #  ) + latticeExtra::layer(sp.polygons(IPCC_shp, col="black", lwd=0.1)) 
+#print(plt)
+
+
