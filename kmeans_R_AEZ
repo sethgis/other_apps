@@ -1,0 +1,426 @@
+#install.packages("raster")
+#install.packages("rgdal")
+#install.packages("rgeos")
+library(raster)
+library(rgdal)
+library(rgeos)
+library(rnoaa)
+library(ncdf4)
+install.packages("eurodatacubeR")
+library(eurodatacubeR)
+
+library(MODIS)
+library(fpc)
+
+library(cluster)
+library(ggplot2)
+library(factoextra)
+
+
+
+terra<-stack("terra_uganda.tif")
+
+rast<-raster("terra_uganda.tif")
+rast
+terra
+terra <- getValues(terra)
+terra
+terra_1 <- data.frame(terra)
+subset <- terra_1[sample(nrow(terra_1), 10000), ]
+subset
+
+#terra_1$terra <- as.numeric(as.character(terra_1$terra))
+
+#scores <- fviz_nbclust(subset, pam, method = "silhouette")
+#scores
+fviz_nbclust(subset, pam, method = "silhouette")+ theme_classic()
+
+kmncluster_sub <- kmeans(na.omit(subset), centers = 75, iter.max = 500, nstart = 5, algorithm="Hartigan-Wong")
+
+kmncluster <- kmeans(na.omit(terra_1), centers = 160, iter.max = 500, nstart = 5, algorithm="Hartigan-Wong")
+
+knr <- setValues(rast, kmncluster$cluster)
+
+#knr<-crop(knr, uganda)
+
+output_format <- "GTiff"  
+
+# Write the raster to file
+writeRaster(knr, filename = "Kmeans_Hart_AEZ_Uganda.tif", format = output_format)
+plot(knr)
+
+
+
+library(raster)
+
+# Read the vector data
+vector_data <- readOGR("UGANDA_LEVLE_4.shp")
+getvalues(vector_data)
+
+# Create an empty raster with the desired extent, resolution, and CRS
+extent <- extent(vector_data)
+extent# Use the extent of the vector data
+res <- 100  # Set the desired resolution
+crs <- CRS("+proj=utm +zone=10 +datum=WGS84")  # Set the desired coordinate reference system
+raster_template <- raster(resolution = res, crs = crs)
+
+# Convert the vector to a raster
+rasterized <- rasterize(vector_data, raster_template)
+vec<-getValues(rasterized)
+vec
+
+
+
+plot(rasterized)
+# Write the raster to a file
+writeRaster(rasterized, filename = "shapefile.tif", format = "GTiff")
+
+plot(rasterized)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for (i in seq_along(k_values)) {
+  k <- k_values[i]
+  kmeans_result <- kmeans(raster_matrix, centers = k, nstart = 10)
+  silhouette_scores[i] <- silhouette_kmeans(raster_matrix, kmeans_result$cluster)
+}
+
+# Determine the optimal number of clusters based on the highest silhouette score
+optimal_k <- k_values[which.max(silhouette_scores)]
+cat("Optimal number of clusters:", optimal_k, "\n")
+
+# Perform k-means clustering with the optimal number of clusters
+kmeans_result <- kmeans(raster_matrix, centers = optimal_k, nstart = 10)
+cluster_labels <- kmeans_result$cluster
+
+# Convert the cluster labels back to a raster stack
+cluster_stack <- setValues(raster_stack, cluster_labels)
+
+# Write the cluster stack to output raster files
+output_files <- paste0("path_to_output_", 1:optimal_k, ".tif")
+writeRaster(cluster_stack, filenames = output_files, format = "GTiff")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for (i in seq_along(k_values)) {
+  k <- k_values[i]
+  kmeans_result <- kmeans(raster_matrix, centers = k, nstart = 10)
+  silhouette_scores[i] <- silhouette_kmeans(raster_matrix, kmeans_result$cluster)
+}
+
+# Determine the optimal number of clusters based on the highest silhouette score
+optimal_k <- k_values[which.max(silhouette_scores)]
+cat("Optimal number of clusters:", optimal_k, "\n")
+
+# Perform k-means clustering with the optimal number of clusters
+kmeans_result <- kmeans(raster_matrix, centers = optimal_k, nstart = 10)
+cluster_labels <- kmeans_result$cluster
+
+# Convert the cluster labels back to a raster stack
+cluster_stack <- setValues(raster_stack, cluster_labels)
+
+# Write the cluster stack to output raster files
+output_files <- paste0("path_to_output_", 1:optimal_k, ".tif")
+writeRaster(cluster_stack, filenames = output_files, format = "GTiff")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+r_values <- extract(clustering_data)
+
+# Reshape the values into a matrix
+r_matrix <- as.data.frame(r_values)
+
+# Perform k-means clustering
+k <- 5  # Number of clusters
+kmeans_result <- kmeans(clustering_data, centers = k, nstart = 10)
+
+
+
+
+
+#clustering_data <- do.call(rbind, clustering_data)
+
+# Calculate pairwise Euclidean distances
+#distances <- dist(clustering_data, method = "euclidean")
+
+#dissimilarity <- dist(clustering_data, method = "euclidean")
+
+
+# Perform k-means clustering with different values of k
+k_values <- 2:1000  # Range of k-values to evaluate
+silhouette_scores <- numeric(length(k_values))
+
+for (i in 1:length(k_values)) {
+  k <- k_values[i]
+  kmeans_result <- kmeans(clustering_data, centers = k, nstart = 10)
+  silhouette_scores[i] <- silhouette(kmeans_result$cluster, dist(clustering_data))$avg.width
+}
+
+# Determine the optimal number of clusters based on the highest silhouette score
+optimal_k <- k_values[which.max(silhouette_scores)]
+
+
+
+
+
+#k <- optimalK(clustering_data, kmeans, method = "silhouette")
+kmeans_result <- kmeans(clustering_data, centers = k$nb, nstart=10)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+writeRaster(merged, filename = "RAINFALL.tif", format = "GTiff", overwrite = TRUE)
+
+
+
+
+##getting the country boundaries from GADM API to clip out rasters
+uganda <- getData("GADM", country = "UGA", level = 0)
+uganda
+
+#calling the SOC API that provides soil organic content via an API, you can change the soil depth to get
+#varying soil depth
+
+#soc_url <- "https://files.isric.org/soilgrids/latest/data/soc/soc_0-30cm_mean.nc"
+
+soc <- raster::brick("SOC_UGANDA_OUTPUT.tif")
+soc
+
+#plot(soc)
+#uganda_soc <- crop(soc, uganda)
+
+
+
+#clippig the SOC data based on Uganda shapefile called above.
+uganda_soc <- crop(soc, uganda)
+
+#Downloading time series rainfall CHIRPS data
+chirps_precip <- raster::brick("https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_daily/netcdf/2022/chirps-v2.0.2022.days_p05.nc")
+uganda_chirps_precip <- crop(chirps_precip, uganda)
+
+#downloading ERA5 temperature data based on a region of interest
+start_date <- "2022-01-01"
+end_date <- "2022-12-30"
+variable <- "2m_temperature"
+format <- "netcdf"
+
+temp_data <- reanalysis(
+  variable = variable,
+  roi = uganda,
+  time_range = c(start_date, end_date),
+  format = format
+)
+
+#download MODIS dataset for NDVI to feed into the k-means classification.
+
+product <- "MOD13Q1"
+tiles <- "h18v04"
+runGdal(product = "MOD13Q1", begin = start_date, end = end_date, extent = uganda, job = "MODIS_ndvi", SDSstring = "250m 16 days NDVI", proj = "4326", tileH = 10, tileV = 6)
+
+#Computing Aridity Index using downloaded temperature data above.
+
+monthly_avg_temperature <- calc(temperature_raster, fun = function(x) mean(x, na.rm = TRUE))
+temperature_raster <- temp_data - 273.15  # Convert from Kelvin to Celsius if necessary
+mean_monthly_temperature <- aggregate(monthly_avg_temperature, by = list(getZ(monthly_avg_temperature)), FUN = mean, na.rm = TRUE)
+temperature_factor <- apply(mean_monthly_temperature, 2, function(x) (x / 5) ^ 1.514)
+aridity_index <- raster::overlay(temperature_raster, temperature_factor, fun = function(t, tf) {
+  sum(tf * (t / 30) ^ 1.514, na.rm = TRUE)
+})
+projection(aridity_index) <- projection(temperature_raster)
+
+
+#Compute SPI and SPEI as an input to K-Means classes
+#temperature_data <- raster::brick("path_to_temperature_file.nc")
+
+spei_data <- raster::stack(temperature_data)
+temperature_data <- temperature_data - 273.15 
+spei_data <- raster::stack(temperature_data)
+spei_result <- spei(spei_data, time_scale = 1, na.rm = TRUE)
+
+
+clustering_data <- cbind(rainfall_values, temperature_values)
+
+
+
+
+
+
+
+
