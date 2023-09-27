@@ -67,7 +67,7 @@ import matplotlib. pyplot as plt
 # conn = psycopg2.connect("host=pulaips-instance-1.cb0ckdnatyiy.eu-west-1.rds.amazonaws.com port=5432 dbname=pas-prod-mavuno  user=korir_ro password=aF29X1q99eUcdHpz")
 
 
-conn = psycopg2.connect("host=pulaips.cluster-cb0ckdnatyiy.eu-west-1.rds.amazonaws.com port=5432 dbname=pas-prod-mavuno  user=seth_pas_ro password=KY5ji83f&k(7YH1")
+
 
 # Create a cursor object
 cur = conn.cursor()
