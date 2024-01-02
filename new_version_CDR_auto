@@ -1,0 +1,782 @@
+from docx.shared import Cm
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Cm, Inches, Mm, Emu
+import random
+import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+import plotly.express as px
+import psycopg2
+from docx.shared import Cm
+from docxtpl import DocxTemplate, InlineImage
+from docx.shared import Cm, Inches, Mm, Emu
+import random
+import datetime
+import matplotlib.pyplot as plt
+import plotly.express as px
+import os
+import textwrap 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+# import geopandas as gpd
+import plotly.express as px
+import argparse
+import rasterio
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from matplotlib.patches import Patch
+from matplotlib.colors import ListedColormap
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import subprocess
+import importlib
+import sys  
+
+
+
+# import importlib
+
+
+importlib.invalidate_caches()
+
+# Clear the cache for all modules
+
+
+template = DocxTemplate('TEMPLATE.docx')
+
+# def main():
+
+# def inputs(projectID: str, title: str,crop: str, country: str, path: str):
+
+def inputs():
+    """
+    This regions prompts the user to enter the details of the project so that the report is generated using this workflow
+    """
+    projectID = input("Enter project ID: ")
+    title = input("Enter Project name/title: ")
+    crop = input("Enter crop/crops insured: ")
+    country = input("Enter country/project implementation area: ")
+    path = input("Enter path to callcenter CSV downloaded from commcare: ")
+    geotiff = input("Enter path to your SPI Geotiff: ")
+    season = input("Please input reporting period or season: ")
+
+
+
+    template = DocxTemplate('TEMPLATE.docx')
+
+    id = projectID
+
+    """
+    This section connects to MAVUNO database and pulls the CSS datasets. After pulling the datasets, it goes ahead to create a dataframe and then 
+    plots the charts. These charts will be used to be inserted in the automated report template as approved ealier.
+    
+    """
+    conn =
+    cur = conn.cursor()
+
+    cur.execute(f"""select cce_id, common_questionnaireresponse.responses->'q_row_spacing' as q_row_spacing,
+    common_questionnaireresponse.responses->'q_enumerator_comment' as q_enumerator_comment,
+    common_questionnaireresponse.responses->'q_farmer_photo' as q_farmer_photo,
+    common_questionnaireresponse.responses->'q_village_name' as q_village_name,
+    common_questionnaireresponse.responses->'admin1' as admin1,
+    common_questionnaireresponse.responses->'q_field_gps' as q_field_gps,
+    common_questionnaireresponse.responses->'q_farmer_sign' as q_farmer_sign,
+    common_questionnaireresponse.responses->'q_crop_variety' as q_crop_variety,
+    common_questionnaireresponse.responses->'q_farm_insured' as q_farm_insured,
+    common_questionnaireresponse.responses->'q_intercropping' as q_intercropping,
+    common_questionnaireresponse.responses->'q_plant_spacing' as q_plant_spacing,
+    common_questionnaireresponse.responses->'q_planting_date' as q_planting_date,
+    common_questionnaireresponse.responses->'q_crop_condition' as q_crop_condition,
+    common_questionnaireresponse.responses->'q_field_irrigated' as q_field_irrigated,
+    common_questionnaireresponse.responses->'q_mode_of_planting' as q_mode_of_planting,
+    common_questionnaireresponse.responses->'q_planted_same_crop' as q_planted_same_crop,
+    common_questionnaireresponse.responses->'q_distance_to_water_body' as q_distance_to_water_body,
+    common_questionnaireresponse.responses->'q_germination_due_to_excess_rain' as q_germination_due_to_excess_rain,
+    common_questionnaireresponse.responses->'q_germination_due_to_drought' as q_germination_due_to_drought,
+    common_questionnaireresponse.responses->'q_germination_due_to_seed_failure' as q_germination_due_to_seed_failure,
+    common_questionnaireresponse.responses->'q_loss_due_to_flood_current_stage' as flood,
+    common_questionnaireresponse.responses->'q_loss_due_to_drought_current_stage' as drought,
+    common_questionnaireresponse.responses->'q_loss_due_to_pest_disease_current_stage' as pest_and_diseases,
+    common_questionnaireresponse.farmer_responses->'age' as age,
+    common_questionnaireresponse.farmer_responses->'uai' as uai,
+    common_questionnaireresponse.farmer_responses->'name' as name,
+    common_questionnaireresponse.farmer_responses->'gender' as gender,
+    common_questionnaireresponse.farmer_responses->'farmer_type' as farmer_type,
+    common_questionnaireresponse.farmer_responses->'insured_crop' as insured_crop,
+    common_project."name"
+    from common_questionnaireresponse inner join common_project on
+    common_questionnaireresponse.project_id = common_project.id
+    where common_project."id" = {id};""")
+
+# Fetch the results and transform it to a dataframe that can be plotted using chats and plots 
+    """
+    This section pulls data directly from mavuno database and chats the intended outputs
+
+    """
+    results = cur.fetchall()
+
+    headers = [i[0] for i in cur.description]
+
+    import pandas as pd
+    df = pd.DataFrame (results, columns= headers)
+
+    if df.empty:
+        error_message = "There was no data to pull from Mavuno DB, please check whether the data is available"
+        print(error_message)
+        excel_file_path = input("Enter the path to alternative CCE excel file ")
+        df = pd.read_csv(excel_file_path)
+        # print(error_message)
+    # else:
+    #     excel_file_path = input("Enter the path to alternative CCE excel file ")
+
+    # if excel_file_path:
+    #     try:
+    #         # Attempt to read the Excel file
+    #         df = pd.read_csv(excel_file_path)
+
+    #         # Perform your analysis on the DataFrame here
+    #         # For example: print the first few rows
+            
+
+    #     except FileNotFoundError:
+    #         print("File not found. Please provide a valid file path.")
+    #     except Exception as e:
+    #         print(f"An error occurred: {str(e)}")
+
+    # else:
+    #     print("No file path provided. Please enter a valid path to an Excel file.")
+       
+
+    # df2 = df[~df['name'].str.startswith(['test', 'TEST', 'Test'])]
+
+    # df2 = df[~df['name'].str.startswith('Test')]
+
+    # print(df2)
+
+    cur.close()
+
+# Close the database connection
+    conn.close()
+
+    # labels = ['None', '0-25%', '25-50%', '50-75%','75-100%']
+
+    # print(df)
+
+    # q_crop_condition
+
+
+
+    """
+    GENERAL CROP CONDITION
+
+    """
+
+
+    # value_counts = df['pest_and_diseases'].value_counts()
+    # value_counts
+    palette = ['#44A7DE', '#142b6e', '#298c37', '#827099', '#0dfc51']
+
+    # labels = ['None', '0-25%', '25-50%', '50-75%','75-100%']
+
+    labels = ['Good', 'Very Good', 'Average', 'Below Average']
+
+    value_counts = df['q_crop_condition'].value_counts()
+    percentages = []
+
+    def my_autopct(pct):
+        total = sum(value_counts)
+        if pct < 5:
+            return ""
+        else:
+            label = '{:.1f}%'.format(pct)
+            if len(label) > 5:
+                label = textwrap.fill(label, 10)
+                percentages.append(pct)
+            return label
+        
+    
+    
+    fig, ax = plt.subplots()
+    pie = ax.pie(value_counts, colors=palette, autopct=my_autopct,pctdistance=0.5,startangle=90)
+    ax.set_title('General crop condition in percentage')
+    
+    plt.legend(pie[0],labels, loc='center left', bbox_to_anchor=(1, 0.5))
+
+    wedges, texts, autotexts = ax.pie(value_counts, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data = []
+    for i, label in enumerate(texts):
+        color = labels[i]
+        percentage = autotexts[i].get_text()
+        data.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain=""
+    for entry in data:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain += f"{entry['Percentage']} of the insured farmers reported {entry['Color']} crop conidtions.\n"
+            # print(explain)
+
+    # print(explain)
+    # for i, (label_2, percentage) in enumerate(zip(legend_labels, percentages)):
+    #     print(f"{label_2}: {percentage}")
+
+# Print the stored percentages
+    # for i, percentage in enumerate(percentages):
+
+    #         print(f"{labels} {i + 1}: {percentage}")
+
+    # plt.show()
+
+    fig.savefig('CONDITION.png', dpi=fig.dpi)
+    plt.close("all")
+
+
+    plt.figure(figsize=(8, 6))
+    fig, ax = plt.subplots()
+    ax1 = value_counts.plot(
+    kind='bar',
+    title='General Crop Conidtion on Count of Farmers',
+    color=palette,  # Replace 'palette' with your color scheme
+    xlabel='Crop condition',
+    ylabel='Count of Farmers')
+
+# Save the plot to a variable
+    my_plot1 = ax1.get_figure()
+
+    # fig.savefig('drought_bar.png', dpi=fig.dpi)
+    my_plot1.savefig('drought_bar.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    plt.figure(figsize=(8, 6))
+
+
+
+
+
+    """
+    FLOOD SECTION - GENERATING FLOOD CHARTS
+    
+    """
+
+    # value_counts = df['pest_and_diseases'].value_counts()
+    # value_counts
+    palette = ['#44A7DE', '#142b6e', '#298c37', '#827099', '#0dfc51']
+
+    labels = ['None', '0-25%', '25-50%', '50-75%','75-100%']
+
+    value_counts = df['flood'].value_counts()
+
+    
+    fig, ax = plt.subplots()
+    pie = ax.pie(value_counts, colors=palette, autopct=my_autopct,pctdistance=0.5,startangle=90)
+    ax.set_title('Flood effect on percentage of insured farmers')
+
+    wedges, texts, autotexts = ax.pie(value_counts, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data = []
+    for i, label in enumerate(texts):
+        color = labels[i]
+        percentage = autotexts[i].get_text()
+        data.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain2=""
+    for entry in data:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain2 += f"{entry['Percentage']} of the insured farmers were affected by floods on {entry['Color']} of their farm size.\n"
+            # print(explain)
+    
+    plt.legend(pie[0], labels, loc='center left', bbox_to_anchor=(1, 0.5))
+
+    # plt.show()
+
+    fig.savefig('image2.png', dpi=fig.dpi)
+
+    fig, ax = plt.subplots()
+    # value_counts = df['drought'].value_counts()
+    # fig.savefig('image1.png', dpi=fig.dpi)
+
+    plt.figure(figsize=(8, 6))
+    ax2 = value_counts.plot(
+    kind='bar',
+    title='Flood Effect on Count of Farmers',
+    color=palette,  # Replace 'palette' with your color scheme
+    xlabel='Size of Farm',
+    ylabel='Count of Farmers')
+
+# Save the plot to a variable
+    my_plot2 = ax2.get_figure()
+
+    # fig.savefig('flood_bar.png', dpi=fig.dpi)
+    my_plot2.savefig('flood_bar.png', dpi=300, bbox_inches='tight')
+
+# Optionally, you can close the plot to free up resources
+    plt.close()
+
+
+    """
+   PEST AND DISEASES - GENERATING PEST AND DISEASES CHARTS
+    
+    """
+
+    # value_counts = df['pest_and_diseases'].value_counts()
+    # value_counts
+    palette = ['#44A7DE', '#142b6e', '#298c37', '#827099', '#0dfc51']
+
+    labels = ['None', '0-25%', '25-50%', '50-75%','75-100%']
+
+    value_counts = df['pest_and_diseases'].value_counts()
+
+
+    
+    fig, ax = plt.subplots()
+    pie = ax.pie(value_counts, colors=palette, autopct=my_autopct,pctdistance=0.5,startangle=90)
+    ax.set_title('Pest and diseases effect on percentage of insured farmers')
+    wedges, texts, autotexts = ax.pie(value_counts, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data = []
+    for i, label in enumerate(texts):
+        color = labels[i]
+        percentage = autotexts[i].get_text()
+        data.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain3=""
+    for entry in data:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain3 += f"{entry['Percentage']} of the insured farmers were affected by pests and diseases on {entry['Color']} of their farm size.\n"
+            # print(explain)
+    
+    plt.legend(pie[0], labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.savefig('image3.png', dpi=fig.dpi)
+
+    """
+    Drawing bar graph for the affected count of farmers crops
+    
+    """
+    plt.figure(figsize=(8, 6))
+    ax3 = value_counts.plot(
+    kind='bar',
+    title='Pest Effect on Count of Farmers',
+    color=palette,  # Replace 'palette' with your color scheme
+    xlabel='Size of Farm',
+    ylabel='Count of Farmers')
+
+# Save the plot to a variable
+    my_plot3 = ax3.get_figure()
+
+    # fig.savefig('Pest_bar.png', dpi=fig.dpi)
+    my_plot3.savefig('Pest_bar.png', dpi=300, bbox_inches='tight')
+    plt.close()
+
+
+    """
+    DROUGHT SECTION - GENERATING DROUGHT CHARTS
+    
+    """
+
+    palette = ['#44A7DE', '#142b6e', '#298c37', '#827099', '#0dfc51']
+
+    labels = ['None', '0-25%', '25-50%', '50-75%','75-100%']
+
+    value_counts = df['drought'].value_counts()
+
+    def my_autopct5(pct):
+        total = sum(value_counts)
+        if pct < 5:
+            return ""
+        else:
+            label = '{:.1f}%'.format(pct)
+            if len(label) > 5:
+                label = textwrap.fill(label, 10)
+            return label
+
+    
+    fig, ax = plt.subplots()
+    pie = ax.pie(value_counts,autopct=my_autopct5,colors=palette,pctdistance=0.5,startangle=90)
+    ax.set_title('Drought effect on percentage of insured farmers')
+
+    wedges, texts, autotexts = ax.pie(value_counts, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data = []
+    for i, label in enumerate(texts):
+        color = labels[i]
+        percentage = autotexts[i].get_text()
+        data.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain4=""
+    for entry in data:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain4 += f"{entry['Percentage']} of the insured farmers were affected by drought on {entry['Color']} of their farm size.\n"
+            # print(explain)
+    
+    plt.legend(pie[0], labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.savefig('image1.png', dpi=fig.dpi)
+    plt.close('all')
+
+
+
+    """
+    Drawing bar graph for the affected count of farmers crops
+    
+    """
+    plt.figure(figsize=(8, 6))
+    ax3 = value_counts.plot(
+    kind='bar',
+    title='Drought Effect on Count of Farmers',
+    color=palette,  # Replace 'palette' with your color scheme
+    xlabel='Size of Farm',
+    ylabel='Count of Farmers')
+
+# Save the plot to a variable
+    my_plot3 = ax3.get_figure()
+
+    # fig.savefig('Pest_bar.png', dpi=fig.dpi)
+    my_plot3.savefig('Real_drought.png', dpi=300, bbox_inches='tight')
+    plt.close()
+
+
+
+    """
+    Drawing bar graph for the affected count of farmers crops
+    
+    """
+    plt.figure(figsize=(8, 6))
+    ax3 = value_counts.plot(
+    kind='bar',
+    title='Pest Effect on Count of Farmers',
+    color=palette,  # Replace 'palette' with your color scheme
+    xlabel='Size of Farm',
+    ylabel='Count of Farmers')
+
+# Save the plot to a variable
+    my_plot3 = ax3.get_figure()
+
+    # fig.savefig('Pest_bar.png', dpi=fig.dpi)
+    my_plot3.savefig('Pest_bar.png', dpi=300, bbox_inches='tight')
+
+# Optionally, you can close the plot to free up resources
+    plt.close()
+
+
+    """
+    This sections processes call center data and automatically plots the chats and graphs to the generated report.
+    
+    """
+
+    file_path = path
+
+    if file_path.endswith('.csv'):
+         df =  pd.read_csv(path,encoding='ISO-8859-1')
+    elif file_path.endswith('.xls', '.xlsx'):
+         df = pd.read_excel(file_path,encoding='ISO-8859-1')
+    else:
+         raise ValueError("Unsupported file format. Please provide a CSV or Excel File")
+    
+    df['form.was_there_an_incidence_of_germination_failure_due_to_drought'].replace({'5': 'None', '4': '75-100 %', '3': '50 - 75 %', '2': '50 - 75 %', '1': '0 - 25 %', '---': 'None'}, inplace=True)
+    df['form.Is_there_an_incidence_of_germination_failure_due_to_floods_or_excessive_rainfall'].replace({'5': 'None', '4': '75-100 %', '3': '50 - 75 %', '2': '50 - 75 %', '1': '0 - 25 %', '---': 'None'}, inplace=True)
+    df['form.overall_germination_rate_in_the_farm'].replace({'5': '75-100 %', '4': '50-75 %', '3': '50-25 %', '2': '25-0 %', '1': '0 - 25 %', '0': 'None' ,'---': 'None'}, inplace=True)
+
+
+    drought = df['form.was_there_an_incidence_of_germination_failure_due_to_drought'].value_counts()
+
+    flood = df['form.Is_there_an_incidence_of_germination_failure_due_to_floods_or_excessive_rainfall'].value_counts()
+
+    general = df['form.overall_germination_rate_in_the_farm'].value_counts()
+
+
+    fig, ax5 = plt.subplots()
+
+
+    def my_autopct1(pct):
+        total = sum(drought)
+        if pct < 5:
+            return ""
+        else:
+            label = '{:.1f}%'.format(pct)
+            if len(label) > 5:
+                label = textwrap.fill(label, 10)
+            return label
+
+
+
+    pie = ax5.pie(drought,colors=palette,autopct=my_autopct1,pctdistance=0.5,startangle=90)
+    ax5.set_title('Drought effect on farmers in percentage')
+    plt.legend(pie[0],labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.savefig('drought.png', dpi=fig.dpi)
+    wedges, texts5, autotexts5 = ax5.pie(drought, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data5 = []
+    for i, label in enumerate(texts5):
+        color = labels[i]
+        percentage = autotexts5[i].get_text()
+        data5.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain5=""
+    for entry5 in data5:  
+        explain5 += f"{entry5['Percentage']} of the insured farmers were affected by drought on {entry5['Color']} of their farm sizes,\n"
+            # print(explain)
+    
+    
+
+    fig, ax6 = plt.subplots()
+    def my_autopct2(pct):
+        total = sum(flood)
+        if pct < 5:
+            return ""
+        else:
+            label = '{:.1f}%'.format(pct)
+            if len(label) > 5:
+                label = textwrap.fill(label, 10)
+            return label
+
+
+
+    pie = ax6.pie(flood,colors=palette,autopct=my_autopct2,pctdistance=0.5,startangle=90)
+    ax6.set_title('Flood effect on percentage of insured farmers')
+    plt.legend(pie[0],labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.savefig('flood.png', dpi=fig.dpi)
+    wedges, texts6, autotexts6 = ax6.pie(flood, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data6 = []
+    for i, label in enumerate(texts6):
+        color = labels[i]
+        percentage = autotexts6[i].get_text()
+        data6.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain6=""
+    for entry6 in data6:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain6 += f"{entry6['Percentage']} of the insured farmers were affected by flood on {entry6['Color']} of their farm sizes,\n"
+            # print(explain)
+    plt.close('all')
+
+    fig, ax7 = plt.subplots()
+    def my_autopct3(pct):
+        total = sum(general)
+        if pct < 5:
+            return ""
+        else:
+            label = '{:.1f}%'.format(pct)
+            if len(label) > 5:
+                label = textwrap.fill(label, 10)
+            return label
+
+    pie = ax7.pie(general,colors=palette,autopct=my_autopct3,pctdistance=0.5,startangle=90)
+    ax7.set_title('General germination rate')
+    plt.legend(pie[0],labels,loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.savefig('general.png', dpi=fig.dpi)
+    wedges, texts7, autotexts7 = ax7.pie(general, colors=palette, autopct=my_autopct, pctdistance=0.5, startangle=90)
+
+    # legend_labels = [(labels[i], percentages[i], palette[i]) for i in range(len(labels))]
+
+# Store the percentages in a list
+    data7 = []
+    for i, label in enumerate(texts7):
+        color = labels[i]
+        percentage = autotexts7[i].get_text()
+        data7.append({'Category': label, 'Percentage': percentage, 'Color': color})
+
+# Print or use the stored data as needed
+    explain7=""
+    for entry7 in data7:  
+            # print(f"{entry['Percentage']} of the insured farmers were affected on {entry['Color']} of their farm sizes ")
+
+        explain7 += f"{entry7['Percentage']} of the insured farmers reported {entry7['Color']} germination rate in their farm,\n"
+            # print(explain)
+   
+
+    plt.close('all')
+
+
+
+
+
+#     script_path = 'call.py'
+
+# # Run the script as a separate process
+#     subprocess.run(['python', script_path])
+
+    # Replace 'your_multiband.tif' with the path to your multiband GeoTIFF file
+    with rasterio.open(geotiff) as dataset:
+        # Read all bands
+        bands = dataset.read()
+        # D:\1.PULA_RS\REPORT\automated_report\automated_report\ACHESA.tif
+
+    
+
+    a4_width_inches = 8.27
+    a4_height_inches = 11.69
+
+    
+    # Create subplots for each band
+    fig, axes = plt.subplots(5, 2, figsize=(a4_width_inches, a4_height_inches))
+    # gadm_boundaries = gpd.read_file('ACHESA_SHP.shp')
+    # gadm_boundaries.plot(ax=ax, facecolor='none', edgecolor='black')
+
+    # fig = plt.figure(figsize=(a4_width_inches, a4_height_inches))
+    # custom_cmap = ListedColormap(['blue', 'green', 'red', 'purple', 'orange', 'yellow'])
+    custom_cmap = ListedColormap(['#d7191c', '#d7d438', '#0df519', '#2096b4', '#214497'])
+
+
+# Loop through the bands and plot them
+    axes = axes.ravel()
+    band_names = ['August 2023', 'September 2023', 'October 2023','November 2023', 'December 2023']
+
+    color = ['Extremely Dry', 'Moderately Dry', 'Near Normal', 'Moderately Wet', 'Extremely Wet']
+
+    
+
+    axes = axes.ravel()
+    num_bands = len(bands)
+
+# Loop through the bands and plot them with the custom colormap
+    for i, band in enumerate(bands):
+        # fig, ax = plt.subplots()
+        # gadm_boundaries.plot(ax=ax, color='black', edgecolor='black', linewidth=0.7)
+        ax = axes[i]
+        ax.imshow(band, cmap=custom_cmap)
+        # gadm_boundaries = gpd.read_file('ACHESA_SHP.shp')
+        # gadm_boundaries.plot(ax=ax, facecolor='blue', edgecolor='red')
+        ax.set_title(band_names[i])
+        im = ax.imshow(band, cmap=custom_cmap)
+        # ax=ax
+        
+
+        ax.axis('off')  
+
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)  # Adjust the size and pad as needed
+        cbar = plt.colorbar(im, cax=cax)
+        main_title = 'Flood and Drought Index Maps'
+
+    for i in range(num_bands, len(axes)):
+        fig.delaxes(axes[i])
+
+        main_title = 'Flood and Drought Index Maps'
+        fig.suptitle(main_title, fontsize=16, fontweight='bold', y=1.02)
+        fig.savefig('MAP.png', dpi=fig.dpi)
+
+    legend_elements = [Patch(facecolor='none', edgecolor='black', label='Level 2 Boundaries')]
+   
+    legend_elements = [Patch(color=color, label=label) for label, color in zip(color, custom_cmap.colors)]
+    # plt.legend(handles=legend_elements, loc='lower right')
+# Add the legend to the figure
+    # fig.legend(handles=legend_elements, loc='lower right', bbox_to_anchor=(0.15, 0.95))
+    
+    
+
+    # 'best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', 'center right', 'lower center', 'upper center',
+
+    cbar_ax = fig.add_axes([0.15, 0.05, 0.7, 0.02])  # [left, bottom, width, height]
+    # cbar = fig.colorbar(im, cax=cbar_ax, orientation='horizontal')
+    # cbar.set_label('Drought and flood index values')
+# Display the plot
+  # Adjust subplot spacing
+    # plt.tight_layout()
+    plt.show()
+    
+
+    
+    table_contents = []
+
+    image1 = InlineImage(template,'image1.png',Cm(10))
+    image2 = InlineImage(template,'image2.png',Cm(10))
+    image3 = InlineImage(template,'image3.png',Cm(10))
+    image4 = InlineImage(template,'drought.png',Cm(10))
+    image5 = InlineImage(template,'flood.png',Cm(10))
+    image6 = InlineImage(template,'general.png',Cm(10))
+    image7 = InlineImage(template,'drought_bar.png',Cm(10))
+    image8 = InlineImage(template,'flood_bar.png',Cm(10))
+    image9 = InlineImage(template,'Pest_bar.png',Cm(10))
+    image10 = InlineImage(template,'CONDITION.png',Cm(10))
+    image11 = InlineImage(template,'MAP.png',Cm(10))
+    image12 = InlineImage(template, 'Real_drought.png', Cm(10))
+   
+
+    context = {
+    'title': 'Automated Report',
+    'day': datetime.datetime.now().strftime('%d'),
+    'month': datetime.datetime.now().strftime('%b'),
+    'year': datetime.datetime.now().strftime('%Y'),
+    'table_contents': table_contents,
+    'image1': image1,
+    'image2': image2,
+    'image3': image3,
+    'image4': image4,
+    'image5': image5,   
+    'image6': image6,
+    'image7': image7,
+    'image8': image8,
+    'image9': image9,
+    'image10': image10,
+    'image11': image11,
+    'image12': image12,
+    'explain':explain,
+    'explain2':explain2,
+    'explain3':explain3,
+    'explain4':explain4,
+    'explain5':explain5,
+    'explain6':explain6,
+    'explain7':explain7,
+    'title': title,
+    'crops': crop,
+    'country':country,
+    'season':season
+    }
+    # doc.add_paragraph(f"Value 1: {value1}")
+    # doc.add_paragraph(f"Value 2: {value2}")
+
+    template.render(context)
+    template.save(title + '.docx')
+
+    importlib.invalidate_caches()
+
+
+    
+
+
+if __name__ == "__main__":
+    inputs()
+
+    
+   
+
+
+# inputs("6403", "AFEX Kenya LR 2023", "Maize","Kenya","D:/1.PULA_RS/REPORT/automated_report/APOLLO_TRUE.tif")
+
+# inputs("6403", "AFEX Kenya LR 2023", "Maize","Kenya","64")
+
+
+
+
+
+
