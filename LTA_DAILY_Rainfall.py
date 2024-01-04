@@ -38,7 +38,7 @@ MODEL = os.path.dirname(os.path.abspath("__file__"))
 
 ppk_file = os.path.join(MODEL, "service_account.json")
 
-service_account = "seth-311@seth-1568964691342.iam.gserviceaccount.com"
+service_account = "seth-311@seth-.iam.gserviceaccount.com"
 
 private_key = ppk_file
 
@@ -46,7 +46,7 @@ credentials = ee.ServiceAccountCredentials(service_account, private_key)
 ee.Initialize(credentials)
 
 
-"""ACCESSING AREA OF INTEREST"""
+""" ACCESSING AREA OF INTEREST"""
 
 # table = ee.FeatureCollection('projects/ee-snyawacha/assets/CDR_BOUNDARIES/KE_Admin_Level_1')
 # table1 = table.geometry()
