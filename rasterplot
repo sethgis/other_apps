@@ -1,0 +1,51 @@
+# Determine the number of columns for the subplot grid
+num_cols = len(bands)
+
+# Calculate the size of each subplot based on A4 dimensions
+a4_width_inches = 8.27
+a4_height_inches = 11.69
+
+# Calculate the number of rows and columns based on the number of bands
+num_rows = (len(bands) + 1) // 2
+num_cols = min(2, len(bands))
+
+# Set up the subplots in a variable-sized matrix
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(a4_width_inches, a4_height_inches))
+
+# Flatten the 2D array to a 1D array for easier indexing
+axes = axes.flatten()
+
+band_names = ['September 2023', 'October 2023', 'November 2023', 'December 2023', 'January 2024']
+
+custom_cmap = ListedColormap(['#d7191c', '#d7d438', '#0df519', '#2096b4', '#214497'])
+
+# Loop through bands
+for i, band in enumerate(bands):
+    class_boundaries = [-1.5, -1.0, -0.99, 1.0, 1.5]
+    class_labels = ['Very Dry', 'Moderately Dry', 'Normal Conditions', 'Moderately Wet', 'Very Wet']
+
+    # Plot GADM boundary for the target country
+    
+
+    # Plot raster band
+    norm = BoundaryNorm(class_boundaries, len(class_boundaries) - 1, clip=True)
+    im = axes[i].imshow(band, cmap=custom_cmap, norm=norm)
+    # im = axes[i].imshow(gadm)
+    # gadm.plot()
+
+    # Set subplot properties
+    axes[i].set_title(band_names[i])
+    divider = make_axes_locatable(axes[i])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(im, cax=cax)
+    cbar.set_ticks(class_boundaries)  # Set tick positions
+    cbar.set_ticklabels(class_labels)  # Set tick labels
+    axes[i].axis('off')
+
+# Set a main title for the entire figure
+fig.suptitle('Flood and Drought Index Maps', fontsize=16)
+
+# Adjust layout to prevent overlapping titles
+plt.tight_layout(rect=[0, 0, 1, 0.97])
+
+plt.show()
