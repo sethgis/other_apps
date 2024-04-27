@@ -217,9 +217,7 @@ async def generate_sld(wetland: Wetland, indicator: Indicator):
 
 
 
-        #             from geo.Geoserver import Geoserver
-        #             geo = Geoserver('http://66.42.65.87:8080/geoserver', username='wemast', password='wemast3582')
-            
+        #        
         # else:
         #     print("Insert correct wetland name")
 
