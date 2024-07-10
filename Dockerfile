@@ -45,3 +45,17 @@ EXPOSE 9001
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9001"]
 
+@##docker compose file is also here
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9001:9001"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+
