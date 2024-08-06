@@ -1,0 +1,91 @@
+
+##CLASSIFICATION
+library(tidyverse)#gives us some libraries
+library(caTools)# split our data dynamically
+library(class)#classification module
+
+set.seed(123)
+seth
+#gives us a copy of the original data
+
+loan_data <- seth
+
+split = sample.split(loan_data$not.fully.paid,SplitRatio=0.8)
+split
+
+train = subset(loan_data,split=TRUE)
+train
+test = subset(loan_data,split=FALSE)
+test
+
+
+train_scaled = scale(train[-2])
+train_scaled
+test_scaled = scale(test[-2])
+test_scaled
+
+train_d = train[-13]
+train_d_2 = train_d[-6]
+train_d_2
+
+test_d = test[-13]
+test_d_2 = test_d[-6]
+test_d_2
+
+model_predict <- knn(train=train_scaled,test=test_scaled,cl=train$not.fully.paid,k=10)
+model_predict <- knn(train=train_scaled,test=test_scaled,cl=train$not.fully.paid,k=10)
+hc <- hclust(dist(train), method="ave")
+hc
+plot(hc)
+rect.hclust(hc, k=3)
+model_predict
+plot(model_predict,col='red')
+
+###CLASSIFICATION
+
+  #using a classification model, using Naive Bayes classification algorithm|classifier
+#loading the sepals data into your model 
+library(lattice)
+library(caret)
+library(e1071)
+
+str(iris)
+View(str(iris))
+summary(iris)
+
+data(iris)
+#structure of the dataset - loading afew tools such as CaTools, Carets
+str(iris)
+
+#splitting the data to training and testing datasets , splitting the datasets on training and testing
+
+split<-sample.split(iris, SplitRatio = 0.7)
+split
+#assigning the splitted data for training and testing
+train_c1 <- subset(iris, split = TRUE)
+test_c1 <- subset(iris, split = FALSE)
+# scale and normalise the datasets, columns 1 to 4
+train_scale <- scale(train_c1[ ,1:4], )
+train_scale
+test_scale <- scale(test_c1[ ,1:4], )
+test_scale
+#fit the Naive-Bayes algorthm  to do the classification on training scaled dataset 
+set.seed(120)
+train_try <- train_c1[ ,1:4]
+train_try
+classifier_bayes<-naiveBayes(Species~.,data=train_c1)
+classifier_bayes
+test_scale2<-test_scale
+test_scale2
+test_c1
+
+#use the priori to predict /classify using the test data
+y_pred<-predict(classifier_bayes, newdata = test_c1)
+y_pred
+
+#confusion matrix- performance using confusion matrix
+cmatrix2 <- table(test_c1$Species, y_pred)
+cmatrix2
+confusionMatrix(cmatrix2)
+library(caret)
+confusionMatrix(cmatrix2)
