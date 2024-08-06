@@ -89,3 +89,31 @@ cmatrix2
 confusionMatrix(cmatrix2)
 library(caret)
 confusionMatrix(cmatrix2)
+
+
+library(datasets)
+library(grid)
+library(mvtnorm)
+library(modeltools)
+library(stats4)
+library(strucchange)
+library(zoo)
+library(party)
+library(dplyr)
+library(magrittr)
+library(caTools)
+
+data("readingSkills")
+head(readingSkills)
+#split the data -  splitting data into subset
+subset_d<-sample.split(readingSkills, SplitRatio = 0.8)
+#Assign training and testing data
+train_d <- subset(readingSkills, subset_d = TRUE)
+test_d <- subset(readingSkills, subset_d = FALSE)
+#pruning of the trees  start by creating the model
+modeltree <- ctree(nativeSpeaker~ .,train_d)
+plot(modeltree)
+prediction<-predict(modeltree, test_d)
+prediction
+m_predict<-table(test_d$nativeSpeaker, )
+
